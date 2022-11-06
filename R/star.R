@@ -1,9 +1,17 @@
 
+
+# RStudio package to manage application directories
+# https://cran.r-project.org/web/packages/rappdirs/index.html
+
+
+
+
 #' @title Function to promote a module
-#' @param pth The path to the module.
+#' @param func The module to push.
+#' @param level The status of the function.  Valid values are d, t, and p.
 #' @export
 #' @import rappdirs
-star_push <- function(func, status = "d") {
+star_push <- function(func, level = "d") {
 
 
   pth <- rappdirs::user_cache_dir("star")
@@ -29,18 +37,12 @@ star_push <- function(func, status = "d") {
 
 
 #' @title Generic function to run module
+#' @param x An object to run.
 #' @export
-runmod <- function (x) {
-  UseMethod("runmod", x)
+star_run <- function (x) {
+  UseMethod("star_run", x)
 }
 
-
-# https://docs.tibco.com/pub/enterprise-runtime-for-R/6.0.0/doc/html/Language_Reference/tools/R_user_dir.html
-#tools::R_user_dir()
-
-
-# RStudio package to do same
-# https://cran.r-project.org/web/packages/rappdirs/index.html
 
 
 
@@ -58,7 +60,7 @@ runmod <- function (x) {
 
     for (fl in lst) {
 
-      print(fl)
+     # print(fl)
 
       if (file.exists(fl)) {
 
@@ -73,17 +75,3 @@ runmod <- function (x) {
 }
 
 
-# myfunc <- function() {
-#
-#  print("Hello")
-# }
-#
-# star_push(myfunc)
-
-#
-#
-# save(myfunc, file = "myfunc.rds")
-#
-#
-# load("myfunc.rds")
-# myfunc()
