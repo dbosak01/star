@@ -153,12 +153,24 @@ setup_module <- function(name, location) {
 }
 
 
+#' @title A cache of available report modules.
+#' @export
+modules <- new.env()
 
 
 # Function that runs when package loads
 #' @import rappdirs
 #' @import common
 .onAttach <- function(...) {
+
+  star_refresh()
+
+}
+
+
+#' @title Refresh the module cache
+#' @export
+star_refresh <- function() {
 
   pth <- rappdirs::user_cache_dir("star")
 
@@ -171,17 +183,15 @@ setup_module <- function(name, location) {
 
     for (fl in lst) {
 
-
       # print(fl)
 
       if (file.exists(fl)) {
 
-        source(fl, local = globalenv())
+        source(fl, local = modules)
 
       }
     }
   }
 
 }
-
 

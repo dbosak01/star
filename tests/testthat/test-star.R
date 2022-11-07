@@ -10,7 +10,7 @@ dev <- FALSE
 test_that("test1: setup_module() works as expected", {
 
 
-  pth <- file.path(base_path, "./modules/test1")
+  pth <- file.path(base_path, "modules/test1")
 
 
   res <- setup_module("test1", pth)
