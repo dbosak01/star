@@ -10,7 +10,7 @@
 #' @export
 #' @import rappdirs
 #' @import common
-push <- function(location, level = "d") {
+push_module <- function(location, level = "d") {
 
   #browser()
 
@@ -64,43 +64,12 @@ push <- function(location, level = "d") {
 
 }
 
-# Version where you pass a loaded function
-# push_back <- function(location, level = "d") {
-#
-#
-#   pth <- rappdirs::user_cache_dir("star")
-#
-#   if (!dir.exists(pth)) {
-#     dir.create(pth, recursive = TRUE)
-#
-#   }
-#
-#   nm <- deparse(substitute(func, env = environment()))
-#
-#
-#   dr <-  file.path(pth, nm)
-#
-#   if (!dir.exists(dr)) {
-#
-#     dir.create(dr)
-#   }
-#
-#   if (file.exists(fl)) {
-#
-#     file.remove(fl)
-#   }
-#
-#   save(list = nm, file = fl, envir = environment())
-#
-# }
-
-
 
 #' @title Generic function to run module
 #' @param x An object to run.
 #' @export
 run <- function (x) {
-  UseMethod("star_run", x)
+  UseMethod("run", x)
 }
 
 
@@ -163,14 +132,14 @@ modules <- new.env()
 #' @import common
 .onAttach <- function(...) {
 
-  star_refresh()
+  refresh_modules()
 
 }
 
 
 #' @title Refresh the module cache
 #' @export
-star_refresh <- function() {
+refresh_modules <- function() {
 
   pth <- rappdirs::user_cache_dir("star")
 

@@ -5,7 +5,7 @@
 \alias{modules}
 \title{A cache of available report modules.}
 \format{
-An object of class \code{environment} of length 1.
+An object of class \code{environment} of length 2.
 }
 \usage{
 modules

@@ -47,7 +47,7 @@ test_that("test2: setup_module() works as expected", {
 
   expect_equal(dex, TRUE)
 
-  res2 <- push(res)
+  res2 <- push_module(res)
 
   dex2 <- dir.exists(res2)
 
