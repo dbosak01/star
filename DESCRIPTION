@@ -6,7 +6,9 @@ Author: David J. Bosak
 Maintainer: David J. Bosak<dbosak01@gmail.com>
 Description: Provides a framework for reporting in R. 
 Imports: rappdirs,
-         common
+         common,
+         yaml,
+         crayon
 License: CC0
 Encoding: UTF-8
 Suggests: 

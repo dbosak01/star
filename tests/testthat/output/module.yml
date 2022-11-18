@@ -1,0 +1,13 @@
+name: Test1
+description: Here is a description
+major_version: 1.0
+minor_version: 2.0
+active: no
+level: test
+keywords:
+- hello
+- goodbye
+dependancies:
+- fmtr
+- reporter
+parameters: []

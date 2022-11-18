@@ -1,8 +1,0 @@
-
-module:
-  name: <modname>
-  description: Put a description of the module here.
-
-parameters:
-  name: Parameter will look like this
-  type: text
