@@ -4,7 +4,7 @@
 \alias{write_module}
 \title{Writes a program module to the file system}
 \usage{
-write_module(mod, location)
+write_module(mod, location = NULL)
 }
 \arguments{
 \item{mod}{The module to write.}

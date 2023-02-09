@@ -1,0 +1,14 @@
+name: test6
+description: here is a description for module 6.
+major_version: 0
+minor_version: 0
+active: yes
+template: no
+level: dev
+parameters: []
+methods: []
+version: v0.0
+created_by: dbosa
+create_date: 1.6726745e+09
+local_path: ./modules/test6
+remote_path: ''

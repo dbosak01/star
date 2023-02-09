@@ -3,6 +3,7 @@ description: Here is a description
 major_version: 1.0
 minor_version: 2.0
 active: no
+template: no
 level: test
 keywords:
 - hello
@@ -11,3 +12,9 @@ dependancies:
 - fmtr
 - reporter
 parameters: []
+methods: []
+version: v1.2
+created_by: dbosa
+create_date: 2023-01-02 16:53:08
+local_path: ''
+remote_path: ''

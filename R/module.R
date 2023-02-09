@@ -8,15 +8,16 @@
 #' @param major_version An integer that identifies the major version number.
 #' @param minor_version An integer that identifies the minor version number.
 #' @param active Whether the module should be activated or not.
+#' @param template Whether the module should be marked as a template.
 #' @param level The development level for this module.  Valid values are
 #' "dev", "test", and "prod".
 #' @param keywords A vector of keywords to use for module search functions.
-#' @param dependancies A vector of packages on which this module is dependant.
+#' @param dependancies A vector of packages on which this module is dependent.
 #' @export
 module <- function(name, description = "",
                    major_version = 0L,
                    minor_version = 0L,
-                   active = TRUE, level = "dev", keywords = c(),
+                   active = TRUE, template = FALSE, level = "dev", keywords = c(),
                    dependancies = c()) {
 
 
@@ -28,12 +29,150 @@ module <- function(name, description = "",
   ret$major_version <- major_version
   ret$minor_version <- minor_version
   ret$active <- active
+  ret$template <- template
   ret$level <- level
   ret$keywords <- keywords
   ret$dependancies <- dependancies
   ret$parameters <- list()
+  ret$methods <- list()
+  ret$version <- paste0("v", major_version, ".", minor_version)
+  ret$created_by <- Sys.info()[["user"]]
+  ret$create_date <- format(Sys.time(), format = "%Y-%m-%d %H:%M:%S")
+  ret$local_path <- ""
+  ret$remote_path <- ""
 
   return(ret)
+
+}
+
+
+
+
+
+#' @title Initialize a new module
+#' @description Function will create folder and template files to
+#' begin development of a new \strong{star} module.
+#' @param name The name of the new module.
+#' @param local_path The development directory for the new module. If the
+#' directory does not exist, it will be created.
+#' @param description A description of the module.
+#' @param major_version An integer that identifies the major version number.
+#' @param minor_version An integer that identifies the minor version number.
+#' @param active Whether the module should be activated or not.
+#' @param template Whether the module should be marked as a template.
+#' @param level The development level for this module.  Valid values are
+#' "dev", "test", and "prod".
+#' @param keywords A vector of keywords to use for module search functions.
+#' @param dependancies A vector of packages on which this module is dependent.
+#' @import common
+#' @export
+create_module <- function(name, local_path, description = "",
+                          major_version = 0L,
+                          minor_version = 0L,
+                          active = TRUE, template = FALSE, level = "dev", keywords = c(),
+                          dependancies = c()) {
+
+
+  res <- TRUE
+
+  if (!dir.exists(local_path))
+    res <- dir.create(local_path, recursive = TRUE)
+
+  if (!res)
+    stop("Location cannot be created.")
+
+
+  # Get external data directory
+  ret <- module(name, description = description, major_version = major_version,
+                minor_version = minor_version, active = active, template = template,
+                level = level, keywords = keywords, dependancies = dependancies)
+
+
+  ret$local_path <- local_path
+
+
+  pkg <- system.file("extdata", package = "star")
+
+  tmplt <- file.path(pkg, "templates/blank")
+
+  lst <- file.find(tmplt, pattern = NULL, up = 0, down = 0)
+
+  for (fl in lst) {
+
+    file.copy(fl, file.path(local_path, basename(fl)),
+              overwrite = TRUE)
+  }
+
+
+  write_module(ret, local_path)
+
+  return(ret)
+
+}
+
+
+
+#' @title Copy an existing module
+#' @description Function will create folder and template files to
+#' begin development of a new \strong{star} module.
+#' @param module The module to copy.  You can pass either a module object
+#' or a module name.
+#' @param name The name of the new module.
+#' @param local_path The development directory for the new module. If the
+#' directory does not exist, it will be created.
+#' @import common
+#' @export
+copy_module <- function(module, name, local_path = NULL) {
+
+
+  ret <- NULL
+
+  # Determine if actual module or name of module
+  # Then take appropriate action.
+  # return module object.
+
+  ret <- module
+
+  if (!dir.exists(local_path)) {
+    dir.create(local_path, recursive = TRUE)
+
+  }
+
+  ret$name <- name
+  ret$local_path <- local_path
+
+
+  write_module(ret, local_path)
+
+
+  return(ret)
+
+}
+
+
+
+#' @title Test a module
+#' @param mod The program module to test.
+#' @export
+test_module <- function(mod = NULL) {
+
+  pth <- mod
+  if ("module" %in% class(mod)) {
+
+
+  }
+
+
+
+}
+
+#' @title Run a module
+#' @param module  The module to run.
+#' @param ... Parameters for the module.
+#' @export
+run_module <- function(module, ...) {
+
+
 
 }
 
@@ -43,6 +182,7 @@ module <- function(name, description = "",
 
 #' @title Reads a program module from the file system
 #' @param location The location to read the module from.
+#' @return A module located at the path provided.
 #' @import yaml
 #' @export
 read_module <- function(location) {
@@ -53,6 +193,8 @@ read_module <- function(location) {
   pth <- file.path(location, "module.yml")
 
   ret <- read_yaml(pth, fileEncoding = "UTF-8")
+
+  class(ret) <- c("module", "list")
 
 
   return(ret)
@@ -65,10 +207,17 @@ read_module <- function(location) {
 #' @param location The file system location to write the module to.
 #' @import yaml
 #' @export
-write_module <- function(mod, location) {
+write_module <- function(mod, location = NULL) {
+
+  if (is.null(location)) {
+
+    location <- mod$local_path
+
+  }
+
 
   if (!dir.exists(location))
-    stop("Location directory does not exist")
+    stop(paste0("Location directory '", location, "' does not exist."))
 
   pth <- file.path(location, "module.yml")
 
@@ -165,10 +314,13 @@ print.module <- function(x, ..., verbose = FALSE) {
 
 
     if (!is.null(x$major_version) & !is.null(x$minor_version))
-      cat("- Version:", paste0(x$major_version, ".", x$minor_version), "\n")
+      cat("- Version:",  x$version, "\n")
 
     if (!is.null(x$active))
       cat("- Active:", x$active, "\n")
+
+    if (!is.null(x$template))
+      cat("- Template:", x$template, "\n")
 
     if (!is.null(x$level))
       cat("- Level:", x$level, "\n")
@@ -178,6 +330,9 @@ print.module <- function(x, ..., verbose = FALSE) {
 
     if (!is.null(x$dependancies))
       cat("- Dependancies:", paste(x$dependancies, collapse = ", "), "\n")
+
+    if (!is.null(x$created_by))
+      cat("- Created:", x$created_by, x$create_date, "\n")
 
   }
 

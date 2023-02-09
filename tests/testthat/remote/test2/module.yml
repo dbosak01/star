@@ -1,0 +1,14 @@
+name: test2
+description: ''
+major_version: 0
+minor_version: 0
+active: yes
+template: no
+level: dev
+parameters: []
+methods: []
+version: v0.0
+created_by: dbosa
+create_date: 1.6726702e+09
+local_path: ./modules/test2
+remote_path: ''

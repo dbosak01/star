@@ -1,0 +1,14 @@
+name: test0
+description: ''
+major_version: 0
+minor_version: 0
+active: yes
+template: no
+level: dev
+parameters: []
+methods: []
+version: v0.0
+created_by: dbosa
+create_date: 2023-01-02 20:38:47
+local_path: c:/packages/star/tests/testthat//modules/test5
+remote_path: ''

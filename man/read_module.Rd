@@ -9,6 +9,9 @@ read_module(location)
 \arguments{
 \item{location}{The location to read the module from.}
 }
+\value{
+A module located at the path provided.
+}
 \description{
 Reads a program module from the file system
 }
