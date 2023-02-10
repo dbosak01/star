@@ -61,11 +61,13 @@ init_ards <- function(studyid = NULL,
 #' @param trtvar A column name to use for the treatment variable.
 #' @param paramcd A description of the analysis parameter.
 #' @param anal_var A column name for the analysis variable.
+#' @param anal_val The analysis variable value.  Can be identified by a column
+#' name or a vector of values.
 #' @return The input data frame, unaltered.
 #' @export
 add_ards <- function(data, statvars, statdesc = NULL,
                      byvars = NULL, trtvar = NULL, paramcd = NULL,
-                     anal_var = NULL) {
+                     anal_var = NULL, anal_val = NULL) {
 
   #browser()
 
@@ -114,7 +116,9 @@ add_ards <- function(data, statvars, statdesc = NULL,
     if (!is.null(byvars)) {
       for (j in seq_along(length(byvars))) {
         ret[[paste0("byvar", j)]] <- byvars[[j]]
-        ret[[paste0("byval", j)]] <- data[[byvars[[j]]]]
+
+        if (!is.null(data[[byvars[[j]]]]))
+          ret[[paste0("byval", j)]] <- data[[byvars[[j]]]]
 
       }
     }
@@ -122,9 +126,16 @@ add_ards <- function(data, statvars, statdesc = NULL,
     # Populate Analysis Variable and Value
     if (!is.null(anal_var)) {
       ret[["anal_var"]] <- anal_var
-      if (anal_var %in% nms) {
+      if (is.null(anal_val)) {
+        if (all(anal_var %in% nms)) {
 
-        ret[["anal_val"]] <- data[[anal_var]]
+          ret[["anal_val"]] <- data[[anal_var]]
+        }
+      } else if (all(anal_val %in% nms)) {
+        ret[["anal_val"]] <- data[[anal_val]]
+      } else {
+
+        ret[["anal_val"]] <- anal_var
       }
     }
 

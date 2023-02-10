@@ -285,6 +285,7 @@ test_that("mod9: run_module() works as expected.", {
 
 
 
+  expect_equal(TRUE, TRUE)
 })
 
 

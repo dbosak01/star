@@ -9,9 +9,9 @@ dev <- FALSE
 
 
 # df <- read.table(header = TRUE, text = '
-#     var     label        ACNT                 B
+#     var     label         trtA          trtB
 #     "ampg"   "N"          "19"          "13"
-#     "ampg"   "Mean"       "18.8 (6.5)"  "22.0 (4.9)"
+#     "ampg"   "Mean (Std)" "18.8 (6.5)"  "22.0 (4.9)"
 #     "ampg"   "Median"     "16.4"        "21.4"
 #     "ampg"   "Q1 - Q3"    "15.1 - 21.2" "19.2 - 22.8"
 #     "ampg"   "Range"      "10.4 - 33.9" "14.7 - 32.4"
@@ -31,8 +31,11 @@ test_that("ards1: ards_init() works as expected.", {
   df
 
 
-  expect_equal(is.null(ardsenv$ards), FALSE)
-  expect_equal(nrow(ardsenv$ards), 0)
+  res <- get_ards()
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(nrow(res), 0)
+  expect_equal(ncol(res), 33)
 
 
 })
@@ -158,7 +161,7 @@ test_that("ards5: add_ards() works as expected in dplyr pipeline.", {
   trt_pop <- count(dat, trt) |> deframe()
 
   cyldf <- dat |>
-    mutate(denom = cyl_pop[paste0(dat$trt)]) |>
+    mutate(denom = trt_pop[paste0(dat$trt)]) |>
     group_by(cyl, trt, denom) |>
     summarize(cnt = n()) |>
     mutate(analvar = "cyl", label = paste(cyl, "Cylinder"),  pct = denom / cnt) |>
@@ -189,7 +192,7 @@ test_that("ards5: add_ards() works as expected in dplyr pipeline.", {
 
 
 
-test_that("ards5: add_ards() works as expected for continuous variable in pipeline.", {
+test_that("ards6: add_ards() works as expected for continuous variable in pipeline.", {
 
   library(dplyr)
   library(tibble)
@@ -243,7 +246,7 @@ test_that("ards5: add_ards() works as expected for continuous variable in pipeli
 
 
 
-test_that("ards5: add_ards() works as expected for multiple analysis variables.", {
+test_that("ards7: add_ards() works as expected for multiple analysis variables.", {
 
   library(dplyr)
   library(tibble)
@@ -294,7 +297,7 @@ test_that("ards5: add_ards() works as expected for multiple analysis variables."
   trt_pop <- count(dat, trt) |> deframe()
 
   cyldf <- dat |>
-    mutate(denom = cyl_pop[paste0(dat$trt)]) |>
+    mutate(denom = trt_pop[paste0(dat$trt)]) |>
     group_by(cyl, trt, denom) |>
     summarize(cnt = n()) |>
     mutate(analvar = "cyl", label = paste(cyl, "Cylinder"),  pct = denom / cnt) |>

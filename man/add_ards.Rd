@@ -31,6 +31,9 @@ for each statvar.}
 \item{paramcd}{A description of the analysis parameter.}
 
 \item{anal_var}{A column name for the analysis variable.}
+
+\item{anal_val}{The analysis variable value.  Can be identified by a column
+name or a vector of values.}
 }
 \value{
 The input data frame, unaltered.

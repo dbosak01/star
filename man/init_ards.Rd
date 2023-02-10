@@ -10,7 +10,8 @@ init_ards(
   adsns = NULL,
   population = NULL,
   time = NULL,
-  where = NULL
+  where = NULL,
+  reset = TRUE
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ value.}
 \item{time}{A description of the time frame used in the analysis.}
 
 \item{where}{A description of the criteria used to subset the data for analysis.}
+
+\item{reset}{If true, clear out existing ards dataset and replace with
+empty template.  Otherwise, just assign parameters to template.}
 }
 \description{
 Initialize the Analysis Results Dataset
