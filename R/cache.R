@@ -72,7 +72,7 @@ push_module <- function(module, level = "d") {
   # Get location of local development directory
   location <- module
   if ("module" %in% class(module))
-    location <- module$local_path
+    location <- file.path(module$local_path, module$version)
 
   pth <- get_cache_directory()
 
@@ -105,18 +105,43 @@ push_module <- function(module, level = "d") {
   if (!dir.exists(dr)) {
 
     dir.create(dr)
+
+  }
+
+  vdr <- file.path(dr, mod$version)
+  if (!dir.exists(vdr)) {
+
+    dir.create(vdr)
   }
 
   mod$remote_path <- dr
 
   # Get list of other files in module
-  lst <- file.find(location, up = 0, down = 0)
+  drs <- dir.find(location, up = -1, down = 5)
+
+  # Copy everything to cache
+  for (dr in drs) {
+
+   d <- file.path(vdr, basename(dr))
+
+    if (dir.exists(d)) {
+
+      unlink(d, recursive = TRUE, force = TRUE)
+    }
+
+    dir.create(d)
+  }
+
+
+
+  # Get list of other files in module
+  lst <- file.find(location, up = 0, down = 5)
 
   # Copy everything to cache
   for (src in lst) {
 
 
-    fl <- file.path(dr, basename(src))
+    fl <- file.path(vdr, basename(src))
 
     if (file.exists(fl)) {
 

@@ -14,7 +14,8 @@ create_module(
   template = FALSE,
   level = "dev",
   keywords = c(),
-  dependancies = c()
+  dependancies = c(),
+  overwrite = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,10 @@ directory does not exist, it will be created.}
 \item{keywords}{A vector of keywords to use for module search functions.}
 
 \item{dependancies}{A vector of packages on which this module is dependent.}
+
+\item{overwrite}{If the module directory already exists, the create_module()
+function will generate an error by default.  Set force = TRUE to overwrite
+the existing directory.}
 }
 \description{
 Function will create folder and template files to

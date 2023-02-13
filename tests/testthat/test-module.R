@@ -71,6 +71,47 @@ test_that("mod2: write_module() and read_module() work as expected.", {
 
 })
 
+test_that("mod3: write_module() and read_module() with version work as expected.", {
+
+
+  mod <- module("Test1", "Here is a description",
+                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
+                c("fmtr", "reporter"))
+
+
+  fp <- file.path(base_path, "output")
+  vfp <- file.path(fp, "v0.0")
+  tpth <- file.path(vfp, "module.yml")
+
+
+  if (file.exists(tpth))
+    file.remove(tpth)
+
+  write_module(mod, vfp)
+
+
+
+  res <- file.exists(tpth)
+
+  expect_equal(res, TRUE)
+
+
+  mod2 <- read_module(fp)
+
+
+  expect_equal(mod$name, mod2$name)
+  expect_equal(mod$description, mod2$description)
+  expect_equal(mod$version, mod2$version)
+  expect_equal(mod$active, mod2$active)
+  expect_equal(mod$template, mod2$template)
+  expect_equal(mod$level, mod2$level)
+  expect_equal(mod$keywords, mod2$keywords)
+  expect_equal(mod$dependancies, mod2$dependancies)
+  expect_equal(mod$created_by, mod$created_by)
+  expect_equal(mod$create_date, mod$create_date)
+
+})
+
 
 
 test_that("mod4: add_parameter() works as expected.", {
@@ -94,24 +135,9 @@ test_that("mod4: add_parameter() works as expected.", {
 })
 
 
-test_that("mod4: add_function() works as expected.", {
 
 
-
-  mod <- module("Test1", "Here is a description",
-                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
-                c("fmtr", "reporter"))
-
-  mod <- add_method(mod, "hellomtd", function(){print("hello")})
-
-
-  expect_equal(mod$hellomtd(), "hello")
-
-
-})
-
-
-test_that("mod4: print.module() works as expected.", {
+test_that("mod5: print.module() works as expected.", {
 
 
 
@@ -129,23 +155,32 @@ test_that("mod4: print.module() works as expected.", {
 
 
 
-test_that("mod5: create_module() works as expected", {
+test_that("mod6: create_module() works as expected", {
 
 
   pth <- file.path(base_path, "modules/test5")
+
+  if (dir.exists(pth))
+    unlink(pth, recursive = TRUE, force = TRUE)
 
 
   res <- create_module("test1", pth)
 
 
   dex <- dir.exists(res$local_path)
-  f1ex <- file.exists(file.path(pth, "module.yml"))
-  f2ex <- file.exists(file.path(pth, "module.R"))
-  f2ex <- file.exists(file.path(pth, "test-module.R"))
+  f1ex <- file.exists(file.path(pth, "v0.0/module.yml"))
+  f2ex <- file.exists(file.path(pth, "v0.0/module.R"))
+  f3ex <- file.exists(file.path(pth, "v0.0/test-module.R"))
+  d1ex <- dir.exists(file.path(pth, "v0.0/output"))
 
   expect_equal(dex, TRUE)
   expect_equal(f1ex, TRUE)
- # expect_equal(f2ex, TRUE)
+  expect_equal(f2ex, TRUE)
+  expect_equal(f3ex, TRUE)
+  expect_equal(d1ex, TRUE)
+
+  expect_error(create_module("test1", pth))
+
 
   if (!dev) {
 
@@ -158,11 +193,13 @@ test_that("mod5: create_module() works as expected", {
 
 
 
-test_that("mod6: push_module() works as expected", {
+test_that("mod7: push_module() works as expected", {
 
 
   pth <- file.path(base_path, "modules/test6")
 
+  if (dir.exists(pth))
+    unlink(pth, recursive = TRUE, force = TRUE)
 
   res <- create_module("test6", pth)
 
@@ -174,9 +211,9 @@ test_that("mod6: push_module() works as expected", {
   res2 <- push_module(res)
 
     dex <- dir.exists(res2$remote_path)
-    f1ex <- file.exists(file.path(res2$remote_path, "module.yml"))
-    f2ex <- file.exists(file.path(res2$remote_path, "module.R"))
-    f3ex <- file.exists(file.path(res2$remote_path, "test-module.R"))
+    f1ex <- file.exists(file.path(res2$remote_path, "v0.0/module.yml"))
+    f2ex <- file.exists(file.path(res2$remote_path, "v0.0/module.R"))
+    f3ex <- file.exists(file.path(res2$remote_path, "v0.0/test-module.R"))
 
     expect_equal(dex, TRUE)
     expect_equal(f1ex, TRUE)
@@ -194,9 +231,7 @@ test_that("mod6: push_module() works as expected", {
 
 
 
-
-
-test_that("mod7: push_module() works as expected again", {
+test_that("mod8: push_module() works as expected again", {
 
 
   lpth <- file.path(base_path, "modules/test7")
@@ -205,7 +240,7 @@ test_that("mod7: push_module() works as expected again", {
 
 
   dex <- dir.exists(res$local_path)
-  f2ex <- file.exists(file.path(lpth, "module.yml"))
+  f2ex <- file.exists(file.path(lpth, "v0.0/module.yml"))
 
   expect_equal(dex, TRUE)
   expect_equal(f2ex, TRUE)
@@ -215,9 +250,9 @@ test_that("mod7: push_module() works as expected again", {
   dex2 <- dir.exists(res2$remote_path)
 
   expect_equal(dex2, TRUE)
-  expect_equal(file.exists(file.path(res2$remote_path, "module.yml")), TRUE)
-  expect_equal(file.exists(file.path(res2$remote_path, "module.R")), TRUE)
-  expect_equal(file.exists(file.path(res2$remote_path, "test-module.R")), TRUE)
+  expect_equal(file.exists(file.path(res2$remote_path, "v0.0/module.yml")), TRUE)
+  expect_equal(file.exists(file.path(res2$remote_path, "v0.0/module.R")), TRUE)
+  expect_equal(file.exists(file.path(res2$remote_path, "v0.0/test-module.R")), TRUE)
 
   expect_equal("test7" %in% names(find_modules()), TRUE)
 #
@@ -235,7 +270,7 @@ test_that("mod7: push_module() works as expected again", {
 
 
 
-test_that("mod8: pull_module() works as expected", {
+test_that("mod9: pull_module() works as expected", {
 
   tpth <- file.path(base_path, "modules")
 
@@ -275,18 +310,27 @@ test_that("mod8: pull_module() works as expected", {
 })
 
 
-test_that("mod9: run_module() works as expected.", {
+test_that("mod10: run_module() works as expected.", {
 
 
   tpth <- file.path(base_path, "modules")
 
 
-  mod <- find_modules(name = "test7")
+  #mod <- find_modules(name = "test5")
+  mod <- read_module(file.path(tpth, "test5"))
 
 
+  res <- run_module(mod, myvar = "fork")
 
-  expect_equal(TRUE, TRUE)
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(res$myvar, "fork")
 })
+
+
+
+
+
 
 
 

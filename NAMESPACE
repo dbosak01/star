@@ -2,7 +2,6 @@
 
 S3method(print,module)
 export(add_ards)
-export(add_method)
 export(add_parameter)
 export(copy_module)
 export(create_module)

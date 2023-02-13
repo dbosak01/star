@@ -11,6 +11,7 @@ add_parameter(
   data_type = NULL,
   input_type = NULL,
   label = NULL,
+  description = NULL,
   options = NULL
 )
 }
@@ -29,8 +30,13 @@ as an R data type class name.}
 
 \item{label}{The label for this parameter.}
 
+\item{description}{A brief description for this parameter.}
+
 \item{options}{A vector of options to use for parameters that accept multiple
 options values.}
+}
+\value{
+The modified module.
 }
 \description{
 Adds a parameter to a program module
