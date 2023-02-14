@@ -4,13 +4,15 @@
 \alias{find_modules}
 \title{Find Modules}
 \usage{
-find_modules(
-  name = NULL,
-  keywords = NULL,
-  templates = NULL,
-  active = NULL,
-  level = NULL
-)
+find_modules(name = NULL, keywords = NULL, version = "latest")
+}
+\arguments{
+\item{name}{The name of the module to search for.}
+
+\item{keywords}{A vector of keywords to search for.}
+
+\item{version}{A parameter that identifies the version or version to search for.
+Valid values are "all", "latest", or a vector of versions in the form "vX.Y".}
 }
 \description{
 Find Modules

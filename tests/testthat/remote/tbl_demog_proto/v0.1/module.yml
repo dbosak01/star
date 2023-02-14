@@ -1,0 +1,39 @@
+name: tbl_demog_proto
+description: An initial prototype demographics module used for development of STAR.
+major_version: 0
+minor_version: 1.0
+active: yes
+template: no
+level: dev
+keywords: demographics prototype
+dependancies:
+- dplyr
+- tibble
+- tidyr
+- common
+- fmtr
+- reporter
+parameters:
+  tableNum:
+    name: tableNum
+    default: '0.0'
+    data_type: character
+    input_type: text
+    label: Table Number
+  myvar:
+    name: myvar
+    data_type: character
+    input_type: text
+    label: Test Variable
+    description: A test variable to take from parent environment
+  reportName:
+    name: reportName
+    default: table1
+    data_type: character
+    input_type: text
+    label: Report File Name
+version: v0.1
+created_by: dbosa
+create_date: 2023-02-12 17:48:40
+local_path: ./tbl_demog_proto
+remote_path: ../remote/tbl_demog_proto

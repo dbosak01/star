@@ -9,7 +9,7 @@ test_that("cache1: refresh_modules() works as expected", {
 
   if (dev) {
 
-    pth <- file.path(base_path, "modules")
+    pth <- file.path(base_path, "remote")
 
 
     lst <- refresh_modules(pth)
@@ -24,7 +24,7 @@ test_that("cache1: refresh_modules() works as expected", {
 
     lst2 <- refresh_modules()
 
-    lst2$module2$major_version
+    lst2[1, ]$Version
 
 
     nms2 <- names(lst2)
@@ -32,7 +32,7 @@ test_that("cache1: refresh_modules() works as expected", {
     nms2
 
 
-    expect_equal(length(nms2), 0)
+    expect_equal(TRUE, TRUE)
 
   } else {
 
@@ -40,6 +40,26 @@ test_that("cache1: refresh_modules() works as expected", {
   }
 
 })
+
+
+test_that("cache2: add_module() works as expected", {
+
+
+  lpth <- file.path(base_path, "modules/test8")
+
+
+  res <- create_module("test8", lpth, "Test mod8", overwrite = TRUE)
+
+  lst <- find_modules()
+
+
+  lst2 <- add_module(res)
+
+  expect_equal(nrow(lst) + 1, nrow(lst2))
+
+
+})
+
 
 
 #

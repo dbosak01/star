@@ -1,6 +1,6 @@
 e <- new.env()
 
-e$modules <- list()
+e$modules <- NULL
 
 
 
@@ -24,37 +24,118 @@ refresh_modules <- function(pth = NULL) {
   if (is.null(pth))
     pth <- get_cache_directory()
 
-  lst <- file.find(pth, pattern = "module.yml", up = -1, down = 1)
+  lst <- file.find(pth, pattern = "module.yml", up = -1, down = 2)
 
   # print(lst)
 
-  e$modules <- list()
+  nm <- c()
+  ver <- c()
+  desc <- c()
+  kwrd <- c()
+  rpth <- c()
+  lver <- c()
+  mlst <- list()
 
   if (length(lst) > 0) {
 
+    cnt <- 0
 
     for (fl in lst) {
 
-      # print(fl)
 
+      cnt <- cnt + 1
       if (file.exists(fl)) {
 
         mod <- read_module(dirname(fl))
 
         if (!is.null(mod$name)) {
-          if (!mod$name %in% names(e$modules)) {
-            e$modules[[mod$name]] <- mod
-          }
+          nm[cnt] <- mod$name
+          if (is.null(mod$version))
+            ver[cnt] <- ""
+          else
+            ver[cnt] <- mod$version
+
+          if (is.null(mod$description))
+              desc[cnt] <- ""
+          else
+            desc[cnt] <- mod$description
+
+          if (is.null(mod$keywords))
+            kwrd[cnt] <- ""
+          else
+            kwrd[cnt] <- mod$keywords
+
+          if (is.null(mod$remote_path))
+            rpth[cnt] <- ""
+          else
+            rpth[cnt] <- mod$remote_path
+
+          lver[cnt] <- FALSE
+          mlst[[cnt]] <- I(mod)
+
         }
       }
     }
   }
 
-  return(e$modules)
+  #browser()
+
+  # Create data frame from vectors
+  mdf <- data.frame(Name = nm, Version = ver, Description = desc,
+                    Keywords = kwrd, RemotePath = rpth,
+                    LastVersion = lver)
+
+  # Assign module
+  mdf$Module <- mlst
+
+  # Set last version
+  mdf$LastVersion <- as.logical(ave(mdf$Version, mdf$Name,
+                                        FUN = function(x) x == max(x)))
+
+  # Assign to modules global variable
+  e$modules <-mdf
+
+  return(mdf)
 
 }
 
 
+add_module <- function(module) {
+
+  ret <- e$modules
+
+  cnt <- nrow(ret) + 1
+
+  if (!is.null(module$name)) {
+    ret[cnt, "Name"] <- module$name
+    if (is.null(module$version))
+      ret[cnt, "Version"] <- ""
+    else
+      ret[cnt, "Version"] <- module$version
+
+    if (is.null(module$description))
+      ret[cnt, "Description"] <- ""
+    else
+      ret[cnt, "Description"] <- module$description
+
+    if (is.null(module$keywords))
+      ret[cnt, "Keywords"] <- ""
+    else
+      ret[cnt, "Keywords"] <- module$keywords
+
+    if (is.null(module$remote_path))
+      ret[cnt, "RemotePath"] <- ""
+    else
+      ret[cnt, "RemotePath"] <- module$remote_path
+
+    ret[cnt, "LastVersion"] <- FALSE
+    ret[[cnt, "Module"]] <- module
+
+  }
+
+  return(ret)
+
+}
 
 
 # RStudio package to manage application directories
@@ -152,7 +233,7 @@ push_module <- function(module, level = "d") {
   }
 
   if (!is.null(mod$name)) {
-    e$modules[[mod$name]] <- mod
+    e$modules <- add_module(mod)
   }
 
 
@@ -166,19 +247,23 @@ push_module <- function(module, level = "d") {
 #' @export
 pull_module <- function(mod, location = NULL) {
 
+  #browser()
+
   if (!dir.exists(location)) {
 
     dir.create(location, recursive = TRUE)
   }
 
   lpth <- file.path(location, mod$name)
+  vpth <- file.path(lpth, mod$version)
 
   if (!dir.exists(lpth)) {
 
     dir.create(lpth, recursive = TRUE)
+    dir.create(vpth, recursive = TRUE)
   }
 
-  spth <- mod$remote_path
+  spth <- file.path(mod$remote_path, mod$version)
 
   # Get list of other files in module
   lst <- file.find(spth, up = 0, down = 0)
@@ -226,21 +311,34 @@ get_cache_directory <- function() {
 }
 
 #' @title Find Modules
+#' @param name The name of the module to search for.
+#' @param keywords  A vector of keywords to search for.
+#' @param version A parameter that identifies the version or version to search for.
+#' Valid values are "all", "latest", or a vector of versions in the form "vX.Y".
 #' @export
-find_modules <- function(name = NULL, keywords = NULL, templates = NULL, active = NULL,
-                         level = NULL) {
+find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
 
-
+#browser()
   ret <- e$modules
 
   if (!is.null(name)) {
 
-     ret <- ret[[name]]
+     ret <- ret[ret$Name == name, ]
   }
 
-  # More filters here
+  if (!is.null(version)) {
+    if (version == "latest") {
 
+
+    } else if (version != "all") {
+
+      ret <- ret[ret$Version %in% version, ]
+    }
+
+  }
 
   return(ret)
 
 }
+
+

@@ -7,7 +7,7 @@
 add_parameter(
   module,
   name,
-  value = NULL,
+  default = NULL,
   data_type = NULL,
   input_type = NULL,
   label = NULL,
@@ -21,7 +21,7 @@ add_parameter(
 \item{name}{The name to associate with the module.  This name should
 be unique in the module cache.}
 
-\item{value}{The default value to use for the parameter.}
+\item{default}{The default value to use for the parameter.}
 
 \item{data_type}{The data type of the parameter value.  Should be specified
 as an R data type class name.}

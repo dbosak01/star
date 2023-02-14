@@ -127,7 +127,7 @@ test_that("mod4: add_parameter() works as expected.", {
 
 
   expect_equal(mod$parameters$spork$name, "spork")
-  expect_equal(mod$parameters$spork$value, 1L)
+  expect_equal(mod$parameters$spork$default, 1L)
   expect_equal(mod$parameters$spork$data_type, "integer")
   expect_equal(mod$parameters$spork$input_type, "text")
 
@@ -236,7 +236,7 @@ test_that("mod8: push_module() works as expected again", {
 
   lpth <- file.path(base_path, "modules/test7")
 
-  res <- create_module("test7", lpth, "Test mod7")
+  res <- create_module("test7", lpth, "Test mod7", overwrite = TRUE)
 
 
   dex <- dir.exists(res$local_path)
@@ -254,7 +254,7 @@ test_that("mod8: push_module() works as expected again", {
   expect_equal(file.exists(file.path(res2$remote_path, "v0.0/module.R")), TRUE)
   expect_equal(file.exists(file.path(res2$remote_path, "v0.0/test-module.R")), TRUE)
 
-  expect_equal("test7" %in% names(find_modules()), TRUE)
+  expect_equal("test7" %in% find_modules()$Name, TRUE)
 #
 #   if (!dev) {
 #
@@ -275,7 +275,7 @@ test_that("mod9: pull_module() works as expected", {
   tpth <- file.path(base_path, "modules")
 
 
-  mod <- find_modules(name = "test7")
+  mod <- find_modules(name = "test6")
 
 
   if (dir.exists(tpth)) {
@@ -283,12 +283,11 @@ test_that("mod9: pull_module() works as expected", {
     unlink(tpth, recursive = TRUE, force = TRUE)
   }
 
-
-  res2 <- pull_module(mod, tpth)
+  res2 <- pull_module(mod$Module[[1]], tpth)
 
 
   dex <- dir.exists(res2$local_path)
-  f2ex <- file.exists(file.path(tpth, "test7/module.yml"))
+  f2ex <- file.exists(file.path(tpth, "test6/module.yml"))
 
   expect_equal(dex, TRUE)
   expect_equal(f2ex, TRUE)
