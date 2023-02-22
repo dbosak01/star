@@ -31,10 +31,10 @@ refresh_modules <- function(pth = NULL) {
   nm <- c()
   ver <- c()
   desc <- c()
+  ta <- c()
   kwrd <- c()
   rpth <- c()
   lver <- c()
-  mlst <- list()
 
   if (length(lst) > 0) {
 
@@ -56,14 +56,19 @@ refresh_modules <- function(pth = NULL) {
             ver[cnt] <- mod$version
 
           if (is.null(mod$description))
-              desc[cnt] <- ""
+            desc[cnt] <- ""
           else
             desc[cnt] <- mod$description
+
+          if (is.null(mod$TA))
+            ta[cnt] <- ""
+          else
+            ta[cnt] <- mod$TA
 
           if (is.null(mod$keywords))
             kwrd[cnt] <- ""
           else
-            kwrd[cnt] <- mod$keywords
+            kwrd[cnt] <- paste(mod$keywords, collapse = " ")
 
           if (is.null(mod$remote_path))
             rpth[cnt] <- ""
@@ -71,7 +76,6 @@ refresh_modules <- function(pth = NULL) {
             rpth[cnt] <- mod$remote_path
 
           lver[cnt] <- FALSE
-          mlst[[cnt]] <- I(mod)
 
         }
       }
@@ -82,11 +86,10 @@ refresh_modules <- function(pth = NULL) {
 
   # Create data frame from vectors
   mdf <- data.frame(Name = nm, Version = ver, Description = desc,
+                    TA = ta,
                     Keywords = kwrd, RemotePath = rpth,
                     LastVersion = lver)
 
-  # Assign module
-  mdf$Module <- mlst
 
   # Set last version
   mdf$LastVersion <- as.logical(ave(mdf$Version, mdf$Name,
@@ -118,10 +121,15 @@ add_module <- function(module) {
     else
       ret[cnt, "Description"] <- module$description
 
+    if (is.null(module$TA))
+      ret[cnt, "TA"] <- ""
+    else
+      ret[cnt, "TA"] <- module$TA
+
     if (is.null(module$keywords))
       ret[cnt, "Keywords"] <- ""
     else
-      ret[cnt, "Keywords"] <- module$keywords
+      ret[cnt, "Keywords"] <- paste(module$keywords, collapse = " ")
 
     if (is.null(module$remote_path))
       ret[cnt, "RemotePath"] <- ""
@@ -129,7 +137,6 @@ add_module <- function(module) {
       ret[cnt, "RemotePath"] <- module$remote_path
 
     ret[cnt, "LastVersion"] <- FALSE
-    ret[[cnt, "Module"]] <- module
 
   }
 
@@ -152,8 +159,22 @@ push_module <- function(module, level = "d") {
 
   # Get location of local development directory
   location <- module
-  if ("module" %in% class(module))
+  if ("module" %in% class(module)) {
     location <- file.path(module$local_path, module$version)
+
+  } else if ("character" %in% class(module)) {
+
+    if (!dir.exists(location)) {
+
+      stop("Module directory location does not exist.")
+    }
+
+    mod <- read_module(location)
+
+  } else {
+
+    stop("Module parameter must be a module object or a local module directory.")
+  }
 
   pth <- get_cache_directory()
 
@@ -162,90 +183,184 @@ push_module <- function(module, level = "d") {
 
   }
 
-  if (!dir.exists(location)) {
-
-    stop("Module directory location does not exist.")
-  }
-
-  # Get module
-  fl <- file.path(location, "module.yml")
-
-  if (!file.exists(fl)) {
-    stop("Module file does not exist.")
-  }
-
-
-  mod <- yaml::read_yaml(fl)
-
   # Get module name
   nm <- mod$name
 
-  dr <-  file.path(pth, nm)
+  rpth <-  file.path(pth, nm)
 
   # Create module folder in cache if needed
-  if (!dir.exists(dr)) {
+  if (!dir.exists(rpth)) {
 
-    dir.create(dr)
+    dir.create(rpth)
 
   }
 
-  vdr <- file.path(dr, mod$version)
+  vdr <- file.path(rpth, mod$version)
   if (!dir.exists(vdr)) {
 
     dir.create(vdr)
   }
 
-  mod$remote_path <- dr
+
 
   # Get list of other files in module
-  drs <- dir.find(location, up = -1, down = 5)
+  drs <- dir.find(location, up = 0, down = 5)
 
   # Copy everything to cache
   for (dr in drs) {
 
-   d <- file.path(vdr, basename(dr))
+    if (basename(vdr) != basename(dr)) {
 
-    if (dir.exists(d)) {
+      d <- file.path(vdr, basename(dr))
 
-      unlink(d, recursive = TRUE, force = TRUE)
+      if (dir.exists(d)) {
+
+        unlink(d, recursive = TRUE, force = TRUE)
+      }
+
+      dir.create(d)
+
+    } else {
+
+      d <- vdr
     }
 
-    dir.create(d)
-  }
+    # Get list of other files in module
+    lst <- file.find(dr, up = 0, down = 0)
+
+    # Copy everything to cache
+    for (src in lst) {
 
 
+      fl <- file.path(d, basename(src))
 
-  # Get list of other files in module
-  lst <- file.find(location, up = 0, down = 5)
+      if (file.exists(fl)) {
 
-  # Copy everything to cache
-  for (src in lst) {
+        file.remove(fl)
+      }
 
-
-    fl <- file.path(vdr, basename(src))
-
-    if (file.exists(fl)) {
-
-      file.remove(fl)
+      file.copy(src, fl, overwrite = TRUE)
     }
 
-    file.copy(src, fl, overwrite = TRUE)
   }
 
+  # Update remote path
+  mod$remote_path <- rpth
+
+  # Save locally
+  write_module(mod)
+
+  # Save remotely
+  write_module(mod, vdr)
+
+  # Add to module list
   if (!is.null(mod$name)) {
     e$modules <- add_module(mod)
   }
-
 
   return(mod)
 
 }
 
 #' @title Pull a module down from the cache
-#' @param mod The module to pull.
-#' @param location  The directory in which to pull the specified module.
+#' @param name The module name to pull.
+#' @param version The module version to pull.  By default, the function
+#' will pull the latest version.
+#' @param location  The directory in which to pull the specified module.  By
+#' default, the function will pull the module into a directory with the same
+#' name as the module in the current working directory.
 #' @export
-pull_module <- function(mod, location = NULL) {
+pull_module <- function(name, version = NULL, location = NULL) {
+
+  #browser()
+
+  if (is.null(location)) {
+
+   location <- "."
+  }
+
+  lpth <- file.path(location, name)
+  rpth <- file.path(get_cache_directory(), name)
+
+  if (is.null(version)) {
+    lst <- find_modules(name = name, version = "latest")
+
+    if (nrow(lst) == 1) {
+      version <- lst[1, "Version"]
+    }
+  }
+
+
+  vpth <- file.path(lpth, version)
+
+  if (!dir.exists(lpth)) {
+
+    dir.create(lpth, recursive = TRUE)
+
+  }
+
+  if (!dir.exists(vpth)) {
+    dir.create(vpth, recursive = TRUE)
+  }
+
+
+  spth <- file.path(rpth, version)
+
+  # Get list of other files in module
+  drs <- dir.find(spth, up = 0, down = 5)
+
+  # Copy everything to local
+  for (dr in drs) {
+
+    if (basename(vpth) != basename(dr)) {
+
+      d <- file.path(vpth, basename(dr))
+
+      if (dir.exists(d)) {
+
+        unlink(d, recursive = TRUE, force = TRUE)
+      }
+
+      dir.create(d)
+
+    } else {
+
+      d <- vpth
+    }
+
+
+    # Get list of other files in module
+    lst <- file.find(dr, up = 0, down = 0)
+
+    # Copy everything to location
+    for (src in lst) {
+
+
+      fl <- file.path(d, basename(src))
+
+      if (file.exists(fl)) {
+
+        file.remove(fl)
+      }
+
+      file.copy(src, fl, overwrite = TRUE)
+    }
+
+  }
+
+
+  mod <- read_module(vpth)
+
+  mod$local_path <- lpth
+
+  write_module(mod, )
+
+  return(mod)
+
+}
+
+
+pull_module_back <- function(name, version = NULL, location = NULL) {
 
   #browser()
 
@@ -311,24 +426,24 @@ get_cache_directory <- function() {
 }
 
 #' @title Find Modules
-#' @param name The name of the module to search for.
+#' @param name The name of the module to search for. Parameter will accept wildcards.
 #' @param keywords  A vector of keywords to search for.
 #' @param version A parameter that identifies the version or version to search for.
 #' Valid values are "all", "latest", or a vector of versions in the form "vX.Y".
+#' @import utils
 #' @export
 find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
 
 #browser()
+
+  refresh_modules()
+
   ret <- e$modules
 
-  if (!is.null(name)) {
-
-     ret <- ret[ret$Name == name, ]
-  }
 
   if (!is.null(version)) {
     if (version == "latest") {
-
+      ret <- ret[ret$LastVersion == TRUE, ]
 
     } else if (version != "all") {
 
@@ -336,6 +451,15 @@ find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
     }
 
   }
+
+  if (!is.null(name)) {
+
+     pos <- grep(glob2rx(name), ret$Name, ignore.case = TRUE)
+
+     ret <- ret[pos, ]
+  }
+
+
 
   return(ret)
 

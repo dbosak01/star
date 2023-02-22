@@ -8,9 +8,11 @@ Description: Provides a framework for reporting in R.
 Imports: rappdirs,
          common,
          yaml,
-         crayon
+         crayon, 
+         utils
 License: CC0
 Encoding: UTF-8
+Depends: R (>= 3.6.0)
 Suggests: 
     knitr,
     rmarkdown,

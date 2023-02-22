@@ -1,0 +1,17 @@
+name: lst_proto
+description: An initial prototype listing.
+major_version: 0
+minor_version: 0.0
+active: yes
+template: no
+level: dev
+keywords:
+- listing
+- prototype
+dependancies: reporter
+parameters: []
+version: v0.0
+created_by: dbosa
+create_date: 2023-02-21 13:51:38
+local_path: ./lst_proto
+remote_path: ''

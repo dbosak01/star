@@ -4,12 +4,17 @@
 \alias{pull_module}
 \title{Pull a module down from the cache}
 \usage{
-pull_module(mod, location = NULL)
+pull_module(name, version = NULL, location = NULL)
 }
 \arguments{
-\item{mod}{The module to pull.}
+\item{name}{The module name to pull.}
 
-\item{location}{The directory in which to pull the specified module.}
+\item{version}{The module version to pull.  By default, the function
+will pull the latest version.}
+
+\item{location}{The directory in which to pull the specified module.  By
+default, the function will pull the module into a directory with the same
+name as the module in the current working directory.}
 }
 \description{
 Pull a module down from the cache

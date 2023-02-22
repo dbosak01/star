@@ -1,0 +1,13 @@
+name: test8
+description: Test mod8
+major_version: 0
+minor_version: 0
+active: yes
+template: no
+level: dev
+parameters: []
+version: v0.0
+created_by: dbosa
+create_date: 2023-02-22 00:49:23
+local_path: c:/packages/star/tests/testthat//modules/test8
+remote_path: ''

@@ -7,8 +7,7 @@
 #' @param description A description of the module.
 #' @param major_version An integer that identifies the major version number.
 #' @param minor_version An integer that identifies the minor version number.
-#' @param active Whether the module should be activated or not.
-#' @param template Whether the module should be marked as a template.
+#' @param TA The therapeutic area to assign this module to.
 #' @param level The development level for this module.  Valid values are
 #' "dev", "test", and "prod".
 #' @param keywords A vector of keywords to use for module search functions.
@@ -16,8 +15,8 @@
 #' @export
 module <- function(name, description = "",
                    major_version = 0L,
-                   minor_version = 0L,
-                   active = TRUE, template = FALSE, level = "dev", keywords = c(),
+                   minor_version = 0L, TA = NULL,
+                   level = "dev", keywords = c(),
                    dependancies = c()) {
 
 
@@ -28,8 +27,7 @@ module <- function(name, description = "",
   ret$description <- description
   ret$major_version <- major_version
   ret$minor_version <- minor_version
-  ret$active <- active
-  ret$template <- template
+  ret$TA <- TA
   ret$level <- level
   ret$keywords <- keywords
   ret$dependancies <- dependancies
@@ -377,14 +375,11 @@ print.module <- function(x, ..., verbose = FALSE) {
     if (!is.null(x$major_version) & !is.null(x$minor_version))
       cat("- Version:",  x$version, "\n")
 
-    if (!is.null(x$active))
-      cat("- Active:", x$active, "\n")
-
-    if (!is.null(x$template))
-      cat("- Template:", x$template, "\n")
-
     if (!is.null(x$level))
       cat("- Level:", x$level, "\n")
+
+    if (!is.null(x$TA))
+      cat("- Theraputic Area:", x$TA, "\n")
 
     if (!is.null(x$keywords))
       cat("- Keywords:", paste(x$keywords, collapse = ", "), "\n")

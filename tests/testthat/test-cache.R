@@ -50,7 +50,7 @@ test_that("cache2: add_module() works as expected", {
 
   res <- create_module("test8", lpth, "Test mod8", overwrite = TRUE)
 
-  lst <- find_modules()
+  lst <- find_modules(version = "all")
 
 
   lst2 <- add_module(res)
@@ -61,6 +61,68 @@ test_that("cache2: add_module() works as expected", {
 })
 
 
+test_that("cache3: find_modules() works with wildcard in name.", {
+
+
+
+
+  lst <- find_modules(name = "tbl*")
+
+  lst
+
+
+  expect_equal(nrow(lst), 1)
+  expect_equal(lst[1, "Version"], "v0.3")
+
+  lst <- find_modules(name = "tbl*", version = "all")
+
+  expect_equal(nrow(lst), 3)
+
+
+  lst <- find_modules(name = "tbl*", version = "v0.2")
+
+  expect_equal(nrow(lst), 1)
+  expect_equal(lst[1, "Version"], "v0.2")
+
+
+})
+
+
+test_that("cache3: find_modules() works with wildcard in name.", {
+
+
+
+
+  lst <- find_modules(name = "lst*")
+
+  lst
+
+  mod <- pull_module(lst$Name)
+
+  expect_equal(is.null(mod), FALSE)
+
+
+})
+
+
+
+test_that("cache4: push_module() works as expected", {
+
+
+  lpth <- file.path(base_path, "modules/test9")
+
+
+  mod <- create_module("test9", lpth, "Test mod9", overwrite = TRUE)
+
+  fl <- file.create(file.path(lpth, "v0.0/output", "myfile.txt"))
+
+
+  res <- push_module(mod)
+
+
+  expect_equal(nrow(lst) + 1, nrow(lst2))
+
+})
 
 #
 #

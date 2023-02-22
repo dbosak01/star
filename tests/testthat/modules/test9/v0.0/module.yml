@@ -1,0 +1,13 @@
+name: test9
+description: Test mod9
+major_version: 0
+minor_version: 0
+active: yes
+template: no
+level: dev
+parameters: []
+version: v0.0
+created_by: dbosa
+create_date: 2023-02-22 00:56:11
+local_path: c:/packages/star/tests/testthat//modules/test9
+remote_path: C:/packages/Amgen/TestSTAR/remote/test9

@@ -7,7 +7,7 @@
 find_modules(name = NULL, keywords = NULL, version = "latest")
 }
 \arguments{
-\item{name}{The name of the module to search for.}
+\item{name}{The name of the module to search for. Parameter will accept wildcards.}
 
 \item{keywords}{A vector of keywords to search for.}
 

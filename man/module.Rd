@@ -9,8 +9,7 @@ module(
   description = "",
   major_version = 0L,
   minor_version = 0L,
-  active = TRUE,
-  template = FALSE,
+  TA = NULL,
   level = "dev",
   keywords = c(),
   dependancies = c()
@@ -25,9 +24,7 @@ module(
 
 \item{minor_version}{An integer that identifies the minor version number.}
 
-\item{active}{Whether the module should be activated or not.}
-
-\item{template}{Whether the module should be marked as a template.}
+\item{TA}{The therapeutic area to assign this module to.}
 
 \item{level}{The development level for this module.  Valid values are
 "dev", "test", and "prod".}
