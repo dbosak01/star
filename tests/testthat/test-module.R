@@ -118,13 +118,14 @@ test_that("mod4: add_parameter() works as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
+                1, 2, "ta", "test", c("hello", "goodbye"),
                 c("fmtr", "reporter"))
 
 
   mod <- add_parameter(mod, "spork", 1L, label = "Spork", data_type = "integer",
                        input_type = "text")
 
+  print(mod)
 
   expect_equal(mod$parameters$spork$name, "spork")
   expect_equal(mod$parameters$spork$default, 1L)
@@ -327,6 +328,37 @@ test_that("mod10: run_module() works as expected.", {
 })
 
 
+
+
+
+test_that("mod11: add_parameter() works as expected.", {
+
+  pth <- file.path(base_path, "modules/test11")
+
+  if (dir.exists(pth))
+    unlink(pth, recursive = TRUE, force = TRUE)
+
+
+  mod <- create_module("test11", local_path = pth,
+                       description = "Here is a description",
+                major_version = 1, minor_version = 2, TA = "ta",
+                level = "test", keywords = c("hello", "goodbye"),
+                dependancies = c("fmtr", "reporter"), overwrite = TRUE)
+
+
+  mod <- add_parameter(mod, "spork", 1L, label = "Spork", data_type = "integer",
+                       input_type = "text")
+
+
+  write_module(mod)
+
+  mod2 <- read_module(pth)
+
+  #print(mod)
+
+  expect_equal(class(mod2$parameters$spork), c("parameter", "list"))
+
+})
 
 
 

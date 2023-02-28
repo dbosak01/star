@@ -55,8 +55,7 @@ module <- function(name, description = "",
 #' @param description A description of the module.
 #' @param major_version An integer that identifies the major version number.
 #' @param minor_version An integer that identifies the minor version number.
-#' @param active Whether the module should be activated or not.
-#' @param template Whether the module should be marked as a template.
+#' @param TA The Therapeutic Area associated with this module.
 #' @param level The development level for this module.  Valid values are
 #' "dev", "test", and "prod".
 #' @param keywords A vector of keywords to use for module search functions.
@@ -68,8 +67,8 @@ module <- function(name, description = "",
 #' @export
 create_module <- function(name, local_path, description = "",
                           major_version = 0L,
-                          minor_version = 0L,
-                          active = TRUE, template = FALSE, level = "dev", keywords = c(),
+                          minor_version = 0L, TA = NULL,
+                          level = "dev", keywords = c(),
                           dependancies = c(), overwrite = FALSE) {
 
 
@@ -77,7 +76,7 @@ create_module <- function(name, local_path, description = "",
 
   # Get external data directory
   ret <- module(name, description = description, major_version = major_version,
-                minor_version = minor_version, active = active, template = template,
+                minor_version = minor_version, TA = TA,
                 level = level, keywords = keywords, dependancies = dependancies)
 
   ret$local_path <- local_path
@@ -267,6 +266,17 @@ read_module <- function(location) {
   class(ret) <- c("module", "list")
 
 
+  if (!is.null(ret$parameters)) {
+    if (length(ret$parameters) > 0) {
+
+      for (i in seq_len(length(ret$parameters))) {
+        class(ret$parameters[[i]]) <- c("parameter", "list")
+
+      }
+    }
+  }
+
+
   return(ret)
 
 }
@@ -390,8 +400,62 @@ print.module <- function(x, ..., verbose = FALSE) {
     if (!is.null(x$created_by))
       cat("- Created:", x$created_by, x$create_date, "\n")
 
+    if (!is.null(x$parameters)) {
+      if (length(x$parameters) > 0) {
+        cat("- Parameters:", length(x$parameters), "\n")
+        for (prm in x$parameters) {
+
+          print(prm)
+
+        }
+      }
+    }
   }
 
   invisible(x)
 
+}
+
+
+
+#' @title Prints information about parameter
+#' @param x The parameter to print.
+#' @param ... Follow on parameters to the print function.
+#' @param verbose Whether to print the module in verbose mode.  Valid values
+#' are TRUE and FALSE.
+#' @import crayon
+#' @export
+print.parameter <- function(x, ..., verbose = FALSE) {
+
+  if (!any(class(x) == "parameter"))
+    stop("Class must be of type 'parameter'.")
+
+  if (verbose == TRUE) {
+    print(unclass(x))
+  } else {
+
+    grey60 <- make_style(grey60 = "#999999")
+    cat(grey60("# A module parameter\n"))
+
+    if (!is.null(x$name))
+      cat("- Name:", x$name, "\n")
+
+
+    if (!is.null(x$description))
+      cat("- Description:", x$description, "\n")
+
+    if (!is.null(x$default))
+      cat("- Default Value:", x$default, "\n")
+
+    if (!is.null(x$data_type))
+      cat("- Data Type:", x$data_type, "\n")
+
+    if (!is.null(x$input_type))
+      cat("- Input Type:", x$input_type, "\n")
+
+    if (!is.null(x$label))
+      cat("- Label:", x$label, "\n")
+  }
+
+  invisible(x)
 }

@@ -10,8 +10,7 @@ create_module(
   description = "",
   major_version = 0L,
   minor_version = 0L,
-  active = TRUE,
-  template = FALSE,
+  TA = NULL,
   level = "dev",
   keywords = c(),
   dependancies = c(),
@@ -30,9 +29,7 @@ directory does not exist, it will be created.}
 
 \item{minor_version}{An integer that identifies the minor version number.}
 
-\item{active}{Whether the module should be activated or not.}
-
-\item{template}{Whether the module should be marked as a template.}
+\item{TA}{The Therapeutic Area associated with this module.}
 
 \item{level}{The development level for this module.  Valid values are
 "dev", "test", and "prod".}
