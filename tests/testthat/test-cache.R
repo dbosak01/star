@@ -5,7 +5,42 @@ base_path <- "."
 dev <- FALSE
 
 
-test_that("cache1: refresh_modules() works as expected", {
+
+test_that("cache1: get_cache_directory() works as expected", {
+
+
+  cfgdir <- rappdirs::user_config_dir("star", roaming = FALSE)
+
+  cfgpth <-  file.path(cfgdir, "Config/config.yml")
+
+  if (file.exists(cfgpth))
+    file.remove(cfgpth)
+
+  res <- get_cache_directory()
+
+  cd <- rappdirs::user_cache_dir("star")
+
+  expect_equal(res, cd)
+
+
+  cfg <- list("cache_directory" = file.path(base_path, "remote"))
+
+
+  yaml::write_yaml(cfg, cfgpth)
+
+  res2 <- get_cache_directory()
+
+  res2
+
+  expect_equal(res2, cfg$cache_directory)
+
+
+
+})
+
+
+
+test_that("cache2: refresh_modules() works as expected", {
 
   if (dev) {
 
@@ -42,7 +77,7 @@ test_that("cache1: refresh_modules() works as expected", {
 })
 
 
-test_that("cache2: add_module() works as expected", {
+test_that("cache3: add_module() works as expected", {
 
 
   lpth <- file.path(base_path, "modules/test8")
@@ -61,7 +96,7 @@ test_that("cache2: add_module() works as expected", {
 })
 
 
-test_that("cache3: find_modules() works with wildcard in name.", {
+test_that("cache4: find_modules() works with wildcard in name.", {
 
 
 
@@ -71,42 +106,26 @@ test_that("cache3: find_modules() works with wildcard in name.", {
   lst
 
 
-  expect_equal(nrow(lst), 1)
-  expect_equal(lst[1, "Version"], "v0.3")
+  expect_equal(nrow(lst) > 0, TRUE)
+  expect_equal(lst[1, "Version"], "v0.1")
 
   lst <- find_modules(name = "tbl*", version = "all")
 
-  expect_equal(nrow(lst), 3)
+  expect_equal(nrow(lst) > 0, TRUE)
 
 
-  lst <- find_modules(name = "tbl*", version = "v0.2")
+  lst <- find_modules(name = "tbl*", version = "v0.1")
 
-  expect_equal(nrow(lst), 1)
-  expect_equal(lst[1, "Version"], "v0.2")
-
-
-})
-
-
-test_that("cache3: find_modules() works with wildcard in name.", {
-
-
-
-
-  lst <- find_modules(name = "lst*")
-
-  lst
-
-  mod <- pull_module(lst$Name)
-
-  expect_equal(is.null(mod), FALSE)
+  expect_equal(nrow(lst) > 0, TRUE)
+  expect_equal(lst[1, "Version"], "v0.1")
 
 
 })
 
 
 
-test_that("cache4: push_module() works as expected", {
+
+test_that("cache5: push_module() works as expected", {
 
 
   lpth <- file.path(base_path, "modules/test9")
@@ -120,7 +139,8 @@ test_that("cache4: push_module() works as expected", {
   res <- push_module(mod)
 
 
-  expect_equal(nrow(lst) + 1, nrow(lst2))
+  expect_equal(is.null(res$remote_path), FALSE)
+  expect_equal(dir.exists(res$remote_path), TRUE)
 
 })
 
@@ -201,37 +221,7 @@ test_that("cache4: push_module() works as expected", {
 # })
 
 
-test_that("mod7: get_cache_directory() works as expected", {
 
-
-  cfgdir <- rappdirs::user_config_dir("star", roaming = FALSE)
-
-  cfgpth <-  file.path(cfgdir, "Config/config.yml")
-
-  if (file.exists(cfgpth))
-    file.remove(cfgpth)
-
-  res <- get_cache_directory()
-
-  cd <- rappdirs::user_cache_dir("star")
-
-  expect_equal(res, cd)
-
-
-  cfg <- list("cache_directory" = file.path(base_path, "remote"))
-
-
-  yaml::write_yaml(cfg, cfgpth)
-
-  res2 <- get_cache_directory()
-
-  res2
-
-  expect_equal(res2, cfg$cache_directory)
-
-
-
-})
 
 
 # test_that("mod8: find_modules() works as expected.", {

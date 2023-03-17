@@ -2,13 +2,10 @@ name: test6
 description: here is a description for module 6.
 major_version: 0
 minor_version: 0
-active: yes
-template: no
 level: dev
 parameters: []
-methods: []
 version: v0.0
 created_by: dbosa
-create_date: 2023-02-09 23:27:06
+create_date: 2023-03-17 06:02:59
 local_path: ./modules/test6
 remote_path: ./remote/test6

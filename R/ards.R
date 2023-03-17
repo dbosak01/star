@@ -1,9 +1,28 @@
+
+
+# Globals -----------------------------------------------------------------
+
+
+
 ardsenv <- new.env()
 
 ardsenv$ards <- NULL
 ardsenv$template <- NULL
 
+
+
+# Functions ---------------------------------------------------------------
+
+
+
 #' @title Initialize the Analysis Results Dataset
+#' @description A function to initialize the Analysis Results Dataset (ARDS).
+#' This function will
+#' first create a data template in the desired structure, and then
+#' populates common values across the dataset.  These common values will be
+#' repeated on each row of the analysis data frame for subsequent inserts.
+#' Use the "reset" parameter to clear out any existing data and start a new
+#' analysis dataset.
 #' @param studyid The study for which the analysis was performed. Optional string value.
 #' @param tableid A table identifier to use for the results. Optional string
 #' value.
@@ -11,8 +30,10 @@ ardsenv$template <- NULL
 #' @param population A description of the analysis population.
 #' @param time A description of the time frame used in the analysis.
 #' @param where A description of the criteria used to subset the data for analysis.
-#' @param reset If true, clear out existing ards dataset and replace with
-#' empty template.  Otherwise, just assign parameters to template.
+#' @param reset If true, clear out existing ARDS dataset and replace with
+#' empty template.  Otherwise, just assign parameters to template.  The default
+#' value is TRUE.
+#' @return The initialized analysis dataset.
 #' @export
 init_ards <- function(studyid = NULL,
                       tableid = NULL, adsns = NULL,
@@ -52,9 +73,17 @@ init_ards <- function(studyid = NULL,
 
 
 #' @title Adds data to an Analysis Results Dataset
+#' @description The \code{add_ards} function dumps data from an input dataset
+#' to the ARDS dataset.  The function is designed to be pipe-friendly, and will
+#' return the input dataset unaltered.  The parameters on the function
+#' define how to extract the desired data from the input dataset.
+#' The "statvars" parameter defines which column names contain desired
+#' analysis data.  The values in these columns will be used to populate the
+#' "statval" variable in the output dataset.  Other parameters are used to
+#' define identifying information for the statistics value, and are optional.
 #' @param data The input dataset to create analysis results for.
 #' @param statvars  A vector of column names that identify the desired results.
-#' Statvar columns must be numeric.
+#' Statvar columns must be numeric.  This parameter is required.
 #' @param statdesc A vector of column names that identify a description value
 #' for each statvar.
 #' @param byvars A vector of column names to use for by variables.
@@ -168,6 +197,10 @@ add_ards <- function(data, statvars, statdesc = NULL,
 }
 
 #' @title Returns the Current Analysis Results Dataset
+#' @description The \code{get_ards} function returns the current state
+#' of the analysis dataset.  This data frame may be saved to disk, saved in
+#' a database, or examined from code.  The function takes no parameters.
+#' @return A data frame of the current analysis results.
 #' @export
 get_ards <- function() {
 

@@ -12,8 +12,7 @@ test_that("mod1: module() works as expected", {
 
 
   mod <- module("Test1", description = "Here is a description",
-                major_version = 1, minor_version = 2, active = FALSE,
-                template = FALSE,
+                major_version = 1, minor_version = 2,
                 level =  "test", keywords = c("hello", "goodbye"),
                 dependancies = c("fmtr", "reporter"))
 
@@ -22,7 +21,6 @@ test_that("mod1: module() works as expected", {
   expect_equal(mod$description, "Here is a description")
   expect_equal(mod$major_version, 1)
   expect_equal(mod$minor_version, 2)
-  expect_equal(mod$active, FALSE)
   expect_equal(mod$level, "test")
   expect_equal(mod$keywords, c("hello", "goodbye"))
   expect_equal(mod$dependancies, c("fmtr", "reporter"))
@@ -35,7 +33,7 @@ test_that("mod2: write_module() and read_module() work as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
+                1, 2, "test", c("hello", "goodbye"),
                 c("fmtr", "reporter"))
 
 
@@ -61,8 +59,6 @@ test_that("mod2: write_module() and read_module() work as expected.", {
   expect_equal(mod$name, mod2$name)
   expect_equal(mod$description, mod2$description)
   expect_equal(mod$version, mod2$version)
-  expect_equal(mod$active, mod2$active)
-  expect_equal(mod$template, mod2$template)
   expect_equal(mod$level, mod2$level)
   expect_equal(mod$keywords, mod2$keywords)
   expect_equal(mod$dependancies, mod2$dependancies)
@@ -75,7 +71,7 @@ test_that("mod3: write_module() and read_module() with version work as expected.
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
+                1, 2, "test", c("hello", "goodbye"),
                 c("fmtr", "reporter"))
 
 
@@ -102,8 +98,6 @@ test_that("mod3: write_module() and read_module() with version work as expected.
   expect_equal(mod$name, mod2$name)
   expect_equal(mod$description, mod2$description)
   expect_equal(mod$version, mod2$version)
-  expect_equal(mod$active, mod2$active)
-  expect_equal(mod$template, mod2$template)
   expect_equal(mod$level, mod2$level)
   expect_equal(mod$keywords, mod2$keywords)
   expect_equal(mod$dependancies, mod2$dependancies)
@@ -125,7 +119,7 @@ test_that("mod4: add_parameter() works as expected.", {
   mod <- add_parameter(mod, "spork", 1L, label = "Spork", data_type = "integer",
                        input_type = "text")
 
-  print(mod)
+  #print(mod)
 
   expect_equal(mod$parameters$spork$name, "spork")
   expect_equal(mod$parameters$spork$default, 1L)
@@ -143,7 +137,7 @@ test_that("mod5: print.module() works as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, FALSE, FALSE, "test", c("hello", "goodbye"),
+                1, 2, "test", c("hello", "goodbye"),
                 c("fmtr", "reporter"))
 
   #print(mod)
@@ -205,7 +199,7 @@ test_that("mod7: push_module() works as expected", {
   res <- create_module("test6", pth)
 
   res$description <- "here is a description for module 6."
-
+ # print(unclass(res))
 
   write_module(res)
 
@@ -221,12 +215,12 @@ test_that("mod7: push_module() works as expected", {
     expect_equal(f2ex, TRUE)
     expect_equal(f3ex, TRUE)
 
-    if (!dev) {
-
-      if (dex)
-        unlink(res$remote_path, recursive = TRUE, force = TRUE)
-
-    }
+    # if (!dev) {
+    #
+    #   if (dex)
+    #     unlink(res$remote_path, recursive = TRUE, force = TRUE)
+    #
+    # }
 
 })
 
@@ -275,37 +269,29 @@ test_that("mod9: pull_module() works as expected", {
 
   tpth <- file.path(base_path, "modules")
 
+  #print(tpth)
+  res2 <- pull_module("test6", location =  tpth)
 
-  mod <- find_modules(name = "test6")
-
-
-  if (dir.exists(tpth)) {
-
-    unlink(tpth, recursive = TRUE, force = TRUE)
-  }
-
-  res2 <- pull_module(mod$Module[[1]], tpth)
-
+  #print(unclass(res2))
 
   dex <- dir.exists(res2$local_path)
-  f2ex <- file.exists(file.path(tpth, "test6/module.yml"))
+  f2ex <- file.exists(file.path(tpth, "test6/v0.0/module.yml"))
 
   expect_equal(dex, TRUE)
   expect_equal(f2ex, TRUE)
-  expect_equal(file.exists(file.path(res2$local_path, "module.R")), TRUE)
-  expect_equal(file.exists(file.path(res2$local_path, "test-module.R")), TRUE)
+  expect_equal(file.exists(file.path(res2$local_path, "v0.0/module.R")), TRUE)
+  expect_equal(file.exists(file.path(res2$local_path, "v0.0/test-module.R")), TRUE)
 
-  expect_equal("test7" %in% names(find_modules()), TRUE)
-
-  if (!dev) {
-
-    if (dex)
-      unlink(res2$local_path, recursive = TRUE, force = TRUE)
-
-    if (dex)
-      unlink(res2$remote_path, recursive = TRUE, force = TRUE)
-
-  }
+#
+#   if (!dev) {
+#
+#     if (dex)
+#       unlink(res2$local_path, recursive = TRUE, force = TRUE)
+#
+#     if (dex)
+#       unlink(res2$remote_path, recursive = TRUE, force = TRUE)
+#
+#   }
 
 })
 
@@ -317,7 +303,7 @@ test_that("mod10: run_module() works as expected.", {
 
 
   #mod <- find_modules(name = "test5")
-  mod <- read_module(file.path(tpth, "test5"))
+  mod <- read_module(file.path(tpth, "test6"))
 
 
   res <- run_module(mod, myvar = "fork")

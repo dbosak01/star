@@ -3,15 +3,21 @@
 
 
 #' @title Defines a new program module
+#' @description A function to instantiate a new module object.  The object
+#' only requires the "name" parameter.  All other parameters are optional.
 #' @param name The name of the new module.
 #' @param description A description of the module.
-#' @param major_version An integer that identifies the major version number.
-#' @param minor_version An integer that identifies the minor version number.
+#' @param major_version An integer that identifies the major version number. If
+#' no value is supplied, the major version will default to zero.
+#' @param minor_version An integer that identifies the minor version number. If
+#' no value is supplied, the minor version will default to zero.
 #' @param TA The therapeutic area to assign this module to.
 #' @param level The development level for this module.  Valid values are
-#' "dev", "test", and "prod".
+#' "dev", "test", and "prod".  Default value is "dev".
 #' @param keywords A vector of keywords to use for module search functions.
 #' @param dependancies A vector of packages on which this module is dependent.
+#' @family module
+#' @return The new module object.
 #' @export
 module <- function(name, description = "",
                    major_version = 0L,
@@ -43,9 +49,6 @@ module <- function(name, description = "",
 }
 
 
-
-
-
 #' @title Initialize a new module
 #' @description Function will create folder and template files to
 #' begin development of a new \strong{star} module.
@@ -63,6 +66,10 @@ module <- function(name, description = "",
 #' @param overwrite If the module directory already exists, the create_module()
 #' function will generate an error by default.  Set force = TRUE to overwrite
 #' the existing directory.
+#' @return The newly created module.  By default, the parameter list will be
+#' empty.  To add a parameter to the module, use the \code{\link{add_parameter}}
+#' function.
+#' @family module
 #' @import common
 #' @export
 create_module <- function(name, local_path, description = "",
@@ -129,14 +136,17 @@ create_module <- function(name, local_path, description = "",
 
 
 #' @title Copy an existing module
-#' @description Function will create folder and template files to
-#' begin development of a new \strong{star} module.
+#' @description Function will copy the passed module and return the copy.
+#' The copy will be located in the specified path, or copy it to the
+#' local path if not specified.
 #' @param module The module to copy.  You can pass either a module object
 #' or a module name.
 #' @param name The name of the new module.
 #' @param local_path The development directory for the new module. If the
 #' directory does not exist, it will be created.
+#' @family module
 #' @import common
+#' @return Returns the copied module.
 #' @export
 copy_module <- function(module, name, local_path = NULL) {
 
@@ -169,6 +179,7 @@ copy_module <- function(module, name, local_path = NULL) {
 
 #' @title Test a module
 #' @param mod The program module to test.
+#' @family module
 #' @export
 test_module <- function(mod = NULL) {
 
@@ -183,8 +194,14 @@ test_module <- function(mod = NULL) {
 }
 
 #' @title Run a module
+#' @description The \code{run_module} function executes a module.  The function
+#' will pass parameters via an environment, and execute the module code
+#' in that environment.  The environment will then be returned from the function
+#' so it can be examined by the calling program.
 #' @param module  The module to run.
 #' @param ... Parameters for the module.
+#' @family module
+#' @return The function will return the environment that the code runs in.
 #' @export
 run_module <- function(module, ...) {
 
@@ -236,9 +253,13 @@ run_module <- function(module, ...) {
 
 
 #' @title Reads a program module from the file system
+#' @description To read a module from disk, use the \code{read_module} function.
+#' The function will read the module into a object and return it.
 #' @param location The location to read the module from.
 #' @return A module located at the path provided.
+#' @family module
 #' @import yaml
+#' @return Returns the module at the specified path.
 #' @export
 read_module <- function(location) {
 
@@ -283,9 +304,16 @@ read_module <- function(location) {
 
 
 #' @title Writes a program module to the file system
+#' @description The \code{write_module} function saves a module to disk.
+#' The function accepts a module object and a location to write it to.  The module
+#' will be saved in a file called "module.R".  If the location parameter is not
+#' passed, the module will be saved in the local path.
 #' @param mod The module to write.
-#' @param location The file system location to write the module to.
+#' @param location The file system location to write the module to.  By default,
+#' the module will be saved in the local path, in a version sub-folder.
+#' @family module
 #' @import yaml
+#' @return The path of the written module.
 #' @export
 write_module <- function(mod, location = NULL) {
 
@@ -314,6 +342,10 @@ write_module <- function(mod, location = NULL) {
 
 
 #' @title Adds a parameter to a program module
+#' @description The \code{add_parameter} function adds a parameter to a module.
+#' Each module is initalized with a parameter list.  This function adds a
+#' parameter to the list.  The arguments of the function define the new
+#' parameter.
 #' @param module The module to add a parameter to.
 #' @param name The name to associate with the module.  This name should
 #' be unique in the module cache.
@@ -325,7 +357,10 @@ write_module <- function(mod, location = NULL) {
 #' @param description A brief description for this parameter.
 #' @param options A vector of options to use for parameters that accept multiple
 #' options values.
-#' @return The modified module.
+#' @return The input module, with new parameter added.
+#' @family module
+#' @return The modified module with new parameter added to the module
+#' parameter list.
 #' @export
 add_parameter <- function(module, name, default = NULL, data_type = NULL,
                           input_type = NULL, label = NULL, description = NULL,
@@ -334,7 +369,7 @@ add_parameter <- function(module, name, default = NULL, data_type = NULL,
   # Create new structure of class "parameter"
   ret <- structure(list(), class = c("parameter", "list"))
 
-
+  # Assign parameters
   ret$name <- name
   ret$default <- default
   ret$data_type <- data_type
@@ -343,7 +378,7 @@ add_parameter <- function(module, name, default = NULL, data_type = NULL,
   ret$description <- description
   ret$options <- options
 
-
+  # Append parameter to the module parameter list
   module$parameters[[name]] <- ret
 
   return(module)
@@ -355,10 +390,15 @@ add_parameter <- function(module, name, default = NULL, data_type = NULL,
 # Print -------------------------------------------------------------------
 
 #' @title Prints information about module
+#' @description A function to print a module.  The print out
+#' will include most attributes of the module, organized in a readable fashion.
+#' The module parameters will also be included in the print out.
 #' @param x The object to print.
 #' @param ... Follow on parameters to the print function.
 #' @param verbose Whether to print the module in verbose mode.  Valid values
 #' are TRUE and FALSE.
+#' @return The module, invisibly.
+#' @family module
 #' @import crayon
 #' @export
 print.module <- function(x, ..., verbose = FALSE) {
@@ -419,11 +459,15 @@ print.module <- function(x, ..., verbose = FALSE) {
 
 
 #' @title Prints information about parameter
+#' @description A function to print a module parameter.  The print out
+#' will include most attributes of the parameter, organized in a readable fashion.
 #' @param x The parameter to print.
 #' @param ... Follow on parameters to the print function.
 #' @param verbose Whether to print the module in verbose mode.  Valid values
 #' are TRUE and FALSE.
+#' @return The parameter, invisibly.
 #' @import crayon
+#' @family module
 #' @export
 print.parameter <- function(x, ..., verbose = FALSE) {
 

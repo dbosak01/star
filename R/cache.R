@@ -1,11 +1,19 @@
+
+
+# Globals -----------------------------------------------------------------
+
+
+
 e <- new.env()
 
 e$modules <- NULL
 
 
+# Events ------------------------------------------------------------------
+
+
 
 # Function that runs when package loads
-
 .onAttach <- function(...) {
 
   refresh_modules()
@@ -13,21 +21,33 @@ e$modules <- NULL
 }
 
 
+
+# Functions ---------------------------------------------------------------
+
+
+
 #' @title Refresh the module cache
 #' @param pth An optional path to the cache.  If NULL, it will use the
 #' path associated with the package.
 #' @import rappdirs
 #' @import common
+#' @family cache
 #' @export
 refresh_modules <- function(pth = NULL) {
 
   if (is.null(pth))
     pth <- get_cache_directory()
 
-  lst <- file.find(pth, pattern = "module.yml", up = -1, down = 2)
+  lst <- c()
 
-  # print(lst)
+  # Get module list
+  if (dir.exists(pth)) {
 
+    lst <- file.find(pth, pattern = "module.yml", up = -1, down = 2)
+  }
+
+
+  # Initalize variables
   nm <- c()
   ver <- c()
   desc <- c()
@@ -36,6 +56,7 @@ refresh_modules <- function(pth = NULL) {
   rpth <- c()
   lver <- c()
 
+  # Populate module data frame
   if (length(lst) > 0) {
 
     cnt <- 0
@@ -82,18 +103,22 @@ refresh_modules <- function(pth = NULL) {
     }
   }
 
-  #browser()
-
   # Create data frame from vectors
   mdf <- data.frame(Name = nm, Version = ver, Description = desc,
                     TA = ta,
                     Keywords = kwrd, RemotePath = rpth,
                     LastVersion = lver)
 
+  if (length(lst) > 0) {
 
   # Set last version
   mdf$LastVersion <- as.logical(ave(mdf$Version, mdf$Name,
                                         FUN = function(x) x == max(x)))
+
+  } else {
+
+    mdf$LastVersion <- c()
+  }
 
   # Assign to modules global variable
   e$modules <-mdf
@@ -103,41 +128,59 @@ refresh_modules <- function(pth = NULL) {
 }
 
 
-add_module <- function(module) {
+#' @title Find Modules
+#' @description
+#' @param name The name of the module to search for. Parameter will accept wildcards.
+#' @param keywords  A vector of keywords to search for.
+#' @param version A parameter that identifies the version or version to search for.
+#' Valid values are "all", "latest", or a vector of versions in the form "vX.Y".
+#' @family cache
+#' @import utils
+#' @export
+find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
 
+
+  # Refresh the module list
+  refresh_modules()
+
+  # Store module list temporarily
   ret <- e$modules
 
-  cnt <- nrow(ret) + 1
+  # Filter by version
+  if (!is.null(version)) {
+    if (version == "latest") {
+      ret <- ret[ret$LastVersion == TRUE, ]
 
-  if (!is.null(module$name)) {
-    ret[cnt, "Name"] <- module$name
-    if (is.null(module$version))
-      ret[cnt, "Version"] <- ""
-    else
-      ret[cnt, "Version"] <- module$version
+    } else if (version != "all") {
 
-    if (is.null(module$description))
-      ret[cnt, "Description"] <- ""
-    else
-      ret[cnt, "Description"] <- module$description
+      ret <- ret[ret$Version %in% version, ]
+    }
 
-    if (is.null(module$TA))
-      ret[cnt, "TA"] <- ""
-    else
-      ret[cnt, "TA"] <- module$TA
+  }
 
-    if (is.null(module$keywords))
-      ret[cnt, "Keywords"] <- ""
-    else
-      ret[cnt, "Keywords"] <- paste(module$keywords, collapse = " ")
+  # Filter by name
+  if (!is.null(name)) {
 
-    if (is.null(module$remote_path))
-      ret[cnt, "RemotePath"] <- ""
-    else
-      ret[cnt, "RemotePath"] <- module$remote_path
+    pos <- grep(glob2rx(name), ret$Name, ignore.case = TRUE)
 
-    ret[cnt, "LastVersion"] <- FALSE
+    ret <- ret[pos, ]
+  }
 
+  # Filter by keywords
+  if (!is.null(keywords)) {
+
+    pos <- c()
+    for (kw in keywords) {
+      kws <- paste0("*", kw, "*")
+
+      tmp <- grep(glob2rx(kws), ret$Keywords, ignore.case = TRUE)
+      pos <- append(pos, tmp)
+
+    }
+
+    pos <- sort(unique(pos))
+
+    ret <- ret[pos, ]
   }
 
   return(ret)
@@ -145,14 +188,16 @@ add_module <- function(module) {
 }
 
 
-# RStudio package to manage application directories
-# https://cran.r-project.org/web/packages/rappdirs/index.html
-
 
 #' @title Function to promote a module
+#' @description The \code{push_module} function promotes a module to the
+#' remote module cache. The function accepts a module object and a promotion
+#' level.
 #' @param module The module to push or the location of the
 #' development directory of the module to push.
 #' @param level The status of the function.  Valid values are d, t, and p.
+#' @return The function will return the pushed module.
+#' @family cache
 #' @export
 #' @import common
 push_module <- function(module, level = "d") {
@@ -161,6 +206,7 @@ push_module <- function(module, level = "d") {
   location <- module
   if ("module" %in% class(module)) {
     location <- file.path(module$local_path, module$version)
+    mod <- module
 
   } else if ("character" %in% class(module)) {
 
@@ -203,7 +249,7 @@ push_module <- function(module, level = "d") {
 
 
 
-  # Get list of other files in module
+  # Get list of other folders in module
   drs <- dir.find(location, up = 0, down = 5)
 
   # Copy everything to cache
@@ -263,12 +309,20 @@ push_module <- function(module, level = "d") {
 }
 
 #' @title Pull a module down from the cache
+#' @description The \code{pull_module} function pulls a module and associated
+#' files down from the module cache and places them in a local directory.  This
+#' function is used to edit a module or examine the code.  You may specify a
+#' specific version of the module.  If  a version is not specified, the function
+#' will return the most recent version.
 #' @param name The module name to pull.
 #' @param version The module version to pull.  By default, the function
 #' will pull the latest version.
 #' @param location  The directory in which to pull the specified module.  By
 #' default, the function will pull the module into a directory with the same
 #' name as the module in the current working directory.
+#' @return The function will return the pulled module.  Any file associated
+#' with the module will be copied to the local path.
+#' @family cache
 #' @export
 pull_module <- function(name, version = NULL, location = NULL) {
 
@@ -360,52 +414,15 @@ pull_module <- function(name, version = NULL, location = NULL) {
 }
 
 
-pull_module_back <- function(name, version = NULL, location = NULL) {
 
-  #browser()
-
-  if (!dir.exists(location)) {
-
-    dir.create(location, recursive = TRUE)
-  }
-
-  lpth <- file.path(location, mod$name)
-  vpth <- file.path(lpth, mod$version)
-
-  if (!dir.exists(lpth)) {
-
-    dir.create(lpth, recursive = TRUE)
-    dir.create(vpth, recursive = TRUE)
-  }
-
-  spth <- file.path(mod$remote_path, mod$version)
-
-  # Get list of other files in module
-  lst <- file.find(spth, up = 0, down = 0)
-
-  # Copy everything to location
-  for (src in lst) {
+# Utilities ---------------------------------------------------------------
 
 
-    fl <- file.path(lpth, basename(src))
 
-    if (file.exists(fl)) {
+# RStudio package to manage application directories
+# https://cran.r-project.org/web/packages/rappdirs/index.html
 
-      file.remove(fl)
-    }
-
-    file.copy(src, fl, overwrite = TRUE)
-  }
-
-
-  mod$local_path <- lpth
-
-
-  return(mod)
-
-}
-
-
+# Internal function to return the location of the module cache
 #' @import rappdirs
 #' @import yaml
 get_cache_directory <- function() {
@@ -425,44 +442,47 @@ get_cache_directory <- function() {
   return(pth)
 }
 
-#' @title Find Modules
-#' @param name The name of the module to search for. Parameter will accept wildcards.
-#' @param keywords  A vector of keywords to search for.
-#' @param version A parameter that identifies the version or version to search for.
-#' Valid values are "all", "latest", or a vector of versions in the form "vX.Y".
-#' @import utils
-#' @export
-find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
 
-#browser()
 
-  refresh_modules()
+# Internal function to append a module to the module list
+add_module <- function(module) {
 
   ret <- e$modules
 
+  cnt <- nrow(ret) + 1
 
-  if (!is.null(version)) {
-    if (version == "latest") {
-      ret <- ret[ret$LastVersion == TRUE, ]
+  if (!is.null(module$name)) {
+    ret[cnt, "Name"] <- module$name
+    if (is.null(module$version))
+      ret[cnt, "Version"] <- ""
+    else
+      ret[cnt, "Version"] <- module$version
 
-    } else if (version != "all") {
+    if (is.null(module$description))
+      ret[cnt, "Description"] <- ""
+    else
+      ret[cnt, "Description"] <- module$description
 
-      ret <- ret[ret$Version %in% version, ]
-    }
+    if (is.null(module$TA))
+      ret[cnt, "TA"] <- ""
+    else
+      ret[cnt, "TA"] <- module$TA
+
+    if (is.null(module$keywords))
+      ret[cnt, "Keywords"] <- ""
+    else
+      ret[cnt, "Keywords"] <- paste(module$keywords, collapse = " ")
+
+    if (is.null(module$remote_path))
+      ret[cnt, "RemotePath"] <- ""
+    else
+      ret[cnt, "RemotePath"] <- module$remote_path
+
+    ret[cnt, "LastVersion"] <- FALSE
 
   }
-
-  if (!is.null(name)) {
-
-     pos <- grep(glob2rx(name), ret$Name, ignore.case = TRUE)
-
-     ret <- ret[pos, ]
-  }
-
-
 
   return(ret)
 
 }
-
 
