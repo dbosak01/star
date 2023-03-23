@@ -10,6 +10,17 @@ refresh_modules(pth = NULL)
 \item{pth}{An optional path to the cache.  If NULL, it will use the
 path associated with the package.}
 }
-\description{
-Refresh the module cache
+\value{
+A dataframe of available modules.
 }
+\description{
+Read the available modules from the module cache and creates
+a data frame with information about the modules.
+}
+\seealso{
+Other cache: 
+\code{\link{find_modules}()},
+\code{\link{pull_module}()},
+\code{\link{push_module}()}
+}
+\concept{cache}

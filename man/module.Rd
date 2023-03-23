@@ -9,8 +9,12 @@ module(
   description = "",
   major_version = 0L,
   minor_version = 0L,
+  type = NULL,
+  status = "Development",
   TA = NULL,
-  level = "dev",
+  indication = NULL,
+  domain = NULL,
+  ADaMIG = NULL,
   keywords = c(),
   dependancies = c()
 )
@@ -20,19 +24,49 @@ module(
 
 \item{description}{A description of the module.}
 
-\item{major_version}{An integer that identifies the major version number.}
+\item{major_version}{An integer that identifies the major version number. If
+no value is supplied, the major version will default to zero.}
 
-\item{minor_version}{An integer that identifies the minor version number.}
+\item{minor_version}{An integer that identifies the minor version number. If
+no value is supplied, the minor version will default to zero.}
+
+\item{type}{The type of module.  Valid values are "Table", "Listing", or
+"Figure".}
+
+\item{status}{The status of the module.  Valid values are "Development" or
+"Release".}
 
 \item{TA}{The therapeutic area to assign this module to.}
 
-\item{level}{The development level for this module.  Valid values are
-"dev", "test", and "prod".}
+\item{indication}{The indication that the module will be used for.  Indication,
+if supplied, is a text string.}
+
+\item{domain}{The ADaM domains to be used for the module. The domain should
+be supplied as a vector of ADaM domain names.}
+
+\item{ADaMIG}{The version of ADaMIG used for this version of the module.}
 
 \item{keywords}{A vector of keywords to use for module search functions.}
 
 \item{dependancies}{A vector of packages on which this module is dependent.}
 }
-\description{
-Defines a new program module
+\value{
+The new module object.
 }
+\description{
+A function to instantiate a new module object.  The object
+only requires the "name" parameter.  All other parameters are optional.
+}
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

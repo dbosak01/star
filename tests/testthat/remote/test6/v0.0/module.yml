@@ -2,10 +2,25 @@ name: test6
 description: here is a description for module 6.
 major_version: 0
 minor_version: 0
-level: dev
-parameters: []
+status: Development
+parameters:
+  x:
+    name: x
+    default: 3.0
+    data_type: integer
+  'y':
+    name: 'y'
+    default: spork
+    data_type: character
+  z:
+    name: z
+    default:
+    - 4.0
+    - 5.0
+    - 6.0
+    data_type: integer
 version: v0.0
 created_by: dbosa
-create_date: 2023-03-17 06:02:59
+create_date: 2023-03-23 07:31:25
 local_path: ./modules/test6
 remote_path: ./remote/test6

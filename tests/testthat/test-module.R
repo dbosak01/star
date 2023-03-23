@@ -13,7 +13,7 @@ test_that("mod1: module() works as expected", {
 
   mod <- module("Test1", description = "Here is a description",
                 major_version = 1, minor_version = 2,
-                level =  "test", keywords = c("hello", "goodbye"),
+                keywords = c("hello", "goodbye"),
                 dependancies = c("fmtr", "reporter"))
 
 
@@ -21,7 +21,6 @@ test_that("mod1: module() works as expected", {
   expect_equal(mod$description, "Here is a description")
   expect_equal(mod$major_version, 1)
   expect_equal(mod$minor_version, 2)
-  expect_equal(mod$level, "test")
   expect_equal(mod$keywords, c("hello", "goodbye"))
   expect_equal(mod$dependancies, c("fmtr", "reporter"))
 
@@ -33,8 +32,8 @@ test_that("mod2: write_module() and read_module() work as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, "test", c("hello", "goodbye"),
-                c("fmtr", "reporter"))
+                1, 2, keywords = c("hello", "goodbye"),
+                dependancies = c("fmtr", "reporter"))
 
 
   fp <- file.path(base_path, "output")
@@ -59,7 +58,6 @@ test_that("mod2: write_module() and read_module() work as expected.", {
   expect_equal(mod$name, mod2$name)
   expect_equal(mod$description, mod2$description)
   expect_equal(mod$version, mod2$version)
-  expect_equal(mod$level, mod2$level)
   expect_equal(mod$keywords, mod2$keywords)
   expect_equal(mod$dependancies, mod2$dependancies)
   expect_equal(mod$created_by, mod$created_by)
@@ -71,8 +69,8 @@ test_that("mod3: write_module() and read_module() with version work as expected.
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, "test", c("hello", "goodbye"),
-                c("fmtr", "reporter"))
+                1, 2, keywords = c("hello", "goodbye"),
+                dependancies = c("fmtr", "reporter"))
 
 
   fp <- file.path(base_path, "output")
@@ -98,7 +96,6 @@ test_that("mod3: write_module() and read_module() with version work as expected.
   expect_equal(mod$name, mod2$name)
   expect_equal(mod$description, mod2$description)
   expect_equal(mod$version, mod2$version)
-  expect_equal(mod$level, mod2$level)
   expect_equal(mod$keywords, mod2$keywords)
   expect_equal(mod$dependancies, mod2$dependancies)
   expect_equal(mod$created_by, mod$created_by)
@@ -112,8 +109,8 @@ test_that("mod4: add_parameter() works as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, "ta", "test", c("hello", "goodbye"),
-                c("fmtr", "reporter"))
+                1, 2, TA = "ta", keywords = c("hello", "goodbye"),
+                dependancies = c("fmtr", "reporter"))
 
 
   mod <- add_parameter(mod, "spork", 1L, label = "Spork", data_type = "integer",
@@ -137,10 +134,12 @@ test_that("mod5: print.module() works as expected.", {
 
 
   mod <- module("Test1", "Here is a description",
-                1, 2, "test", c("hello", "goodbye"),
-                c("fmtr", "reporter"))
+                1, 2, TA = "ta", status = "Release", type = "Table",
+                indication = "ind", domain = "ADSL", ADaMIG = "1.2",
+                keywords = c("hello", "goodbye"),
+                dependancies = c("fmtr", "reporter"))
 
-  #print(mod)
+  print(mod)
 
 
   expect_equal(1, 1)
@@ -199,6 +198,17 @@ test_that("mod7: push_module() works as expected", {
   res <- create_module("test6", pth)
 
   res$description <- "here is a description for module 6."
+
+
+  # module, name, default = NULL, data_type = NULL,
+  # input_type = NULL, label = NULL, description = NULL,
+  # options = NULL)
+
+
+  res <- add_parameter(res, "x", default = 3, data_type = "integer")
+  res <- add_parameter(res, "y", default = "spork", data_type = "character")
+  res <- add_parameter(res, "z", default = c(4, 5, 6), data_type = "integer")
+
  # print(unclass(res))
 
   write_module(res)
@@ -231,7 +241,8 @@ test_that("mod8: push_module() works as expected again", {
 
   lpth <- file.path(base_path, "modules/test7")
 
-  res <- create_module("test7", lpth, "Test mod7", overwrite = TRUE)
+  res <- create_module("test7", local_path = lpth,
+                       description = "Test mod7", overwrite = TRUE)
 
 
   dex <- dir.exists(res$local_path)
@@ -249,7 +260,7 @@ test_that("mod8: push_module() works as expected again", {
   expect_equal(file.exists(file.path(res2$remote_path, "v0.0/module.R")), TRUE)
   expect_equal(file.exists(file.path(res2$remote_path, "v0.0/test-module.R")), TRUE)
 
-  expect_equal("test7" %in% find_modules()$Name, TRUE)
+  expect_equal("test7" %in% find_modules(version = "all", status = "all")$Name, TRUE)
 #
 #   if (!dev) {
 #
@@ -328,7 +339,7 @@ test_that("mod11: add_parameter() works as expected.", {
   mod <- create_module("test11", local_path = pth,
                        description = "Here is a description",
                 major_version = 1, minor_version = 2, TA = "ta",
-                level = "test", keywords = c("hello", "goodbye"),
+                keywords = c("hello", "goodbye"),
                 dependancies = c("fmtr", "reporter"), overwrite = TRUE)
 
 

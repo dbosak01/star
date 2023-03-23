@@ -16,6 +16,21 @@ will pull the latest version.}
 default, the function will pull the module into a directory with the same
 name as the module in the current working directory.}
 }
-\description{
-Pull a module down from the cache
+\value{
+The function will return the pulled module.  Any file associated
+with the module will be copied to the local path.
 }
+\description{
+The \code{pull_module} function pulls a module and associated
+files down from the module cache and places them in a local directory.  This
+function is used to edit a module or examine the code.  You may specify a
+specific version of the module.  If  a version is not specified, the function
+will return the most recent version.
+}
+\seealso{
+Other cache: 
+\code{\link{find_modules}()},
+\code{\link{push_module}()},
+\code{\link{refresh_modules}()}
+}
+\concept{cache}

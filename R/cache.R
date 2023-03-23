@@ -27,10 +27,14 @@ e$modules <- NULL
 
 
 #' @title Refresh the module cache
+#' @description Read the available modules from the module cache and creates
+#' a data frame with information about the modules.
 #' @param pth An optional path to the cache.  If NULL, it will use the
 #' path associated with the package.
+#' @return A dataframe of available modules.
 #' @import rappdirs
 #' @import common
+#' @import stats
 #' @family cache
 #' @export
 refresh_modules <- function(pth = NULL) {
@@ -51,7 +55,12 @@ refresh_modules <- function(pth = NULL) {
   nm <- c()
   ver <- c()
   desc <- c()
+  typ <- c()
+  sta <- c()
   ta <- c()
+  ind <- c()
+  dom <- c()
+  adm <- c()
   kwrd <- c()
   rpth <- c()
   lver <- c()
@@ -81,10 +90,35 @@ refresh_modules <- function(pth = NULL) {
           else
             desc[cnt] <- mod$description
 
+          if (is.null(mod$type))
+            typ[cnt] <- ""
+          else
+            typ[cnt] <- mod$type
+
+          if (is.null(mod$status))
+            sta[cnt] <- ""
+          else
+            sta[cnt] <- mod$status
+
           if (is.null(mod$TA))
             ta[cnt] <- ""
           else
             ta[cnt] <- mod$TA
+
+          if (is.null(mod$indication))
+            ind[cnt] <- ""
+          else
+            ind[cnt] <- mod$indication
+
+          if (is.null(mod$domain))
+            dom[cnt] <- ""
+          else
+            dom[cnt] <- mod$domain
+
+          if (is.null(mod$ADaMIG))
+            adm[cnt] <- ""
+          else
+            adm[cnt] <- mod$ADaMIG
 
           if (is.null(mod$keywords))
             kwrd[cnt] <- ""
@@ -105,7 +139,9 @@ refresh_modules <- function(pth = NULL) {
 
   # Create data frame from vectors
   mdf <- data.frame(Name = nm, Version = ver, Description = desc,
-                    TA = ta,
+                    Type = typ, Status = sta,
+                    TA = ta, Indication = ind, Domain = dom,
+                    ADaMIG = adm,
                     Keywords = kwrd, RemotePath = rpth,
                     LastVersion = lver)
 
@@ -129,15 +165,27 @@ refresh_modules <- function(pth = NULL) {
 
 
 #' @title Find Modules
-#' @description
+#' @description Allows the user to search for modules in the module cache.  The
+#' function will return a data frame of modules that meet the specified criteria.
+#' Available search criteria are the name, keywords, and module version.
 #' @param name The name of the module to search for. Parameter will accept wildcards.
+#' @param type The type of module to search for.  Valid values are "Table",
+#' "Listing", or "Figure".
+#' @param TA The Therapeutic Area to search for.
+#' @param domain The domain to search for.
+#' @param indication The indication to search for.
 #' @param keywords  A vector of keywords to search for.
+#' @param status The status of the module to search for.  Valid values are
+#' "Development" and "Release".
 #' @param version A parameter that identifies the version or version to search for.
 #' Valid values are "all", "latest", or a vector of versions in the form "vX.Y".
+#' @return A data frame of modules that meet the search criteria.
 #' @family cache
 #' @import utils
 #' @export
-find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
+find_modules <- function(name = NULL, type = NULL, TA = NULL, domain = NULL,
+                         indication = NULL,
+                         keywords = NULL, status = "Release", version = "latest") {
 
 
   # Refresh the module list
@@ -145,6 +193,12 @@ find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
 
   # Store module list temporarily
   ret <- e$modules
+
+  # Filter by status
+  if (!is.null(status)) {
+    if (status != "all")
+      ret <- ret[ret$Status == status, ]
+  }
 
   # Filter by version
   if (!is.null(version)) {
@@ -156,6 +210,35 @@ find_modules <- function(name = NULL, keywords = NULL, version = "latest") {
       ret <- ret[ret$Version %in% version, ]
     }
 
+  }
+
+  # Filter by type
+  if (!is.null(type)) {
+    ret <- ret[ret$Type == type, ]
+  }
+
+  # Filter by TA
+  if (!is.null(TA)) {
+
+    pos <- grep(glob2rx(TA), ret$TA, ignore.case = TRUE)
+
+    ret <- ret[pos, ]
+  }
+
+  # Filter by domain
+  if (!is.null(domain)) {
+
+    pos <- grep(glob2rx(domain), ret$Domain, ignore.case = TRUE)
+
+    ret <- ret[pos, ]
+  }
+
+  # Filter by indication
+  if (!is.null(indication)) {
+
+    pos <- grep(glob2rx(indication), ret$Indication, ignore.case = TRUE)
+
+    ret <- ret[pos, ]
   }
 
   # Filter by name
@@ -337,7 +420,7 @@ pull_module <- function(name, version = NULL, location = NULL) {
   rpth <- file.path(get_cache_directory(), name)
 
   if (is.null(version)) {
-    lst <- find_modules(name = name, version = "latest")
+    lst <- find_modules(name = name, version = "latest", status = "all")
 
     if (nrow(lst) == 1) {
       version <- lst[1, "Version"]
@@ -463,10 +546,30 @@ add_module <- function(module) {
     else
       ret[cnt, "Description"] <- module$description
 
+    if (is.null(module$status))
+      ret[cnt, "Status"] <- ""
+    else
+      ret[cnt, "Status"] <- module$status
+
+    if (is.null(module$type))
+      ret[cnt, "Type"] <- ""
+    else
+      ret[cnt, "Type"] <- module$type
+
     if (is.null(module$TA))
       ret[cnt, "TA"] <- ""
     else
       ret[cnt, "TA"] <- module$TA
+
+    if (is.null(module$domain))
+      ret[cnt, "Domain"] <- ""
+    else
+      ret[cnt, "Domain"] <- module$domain
+
+    if (is.null(module$indication))
+      ret[cnt, "Indication"] <- ""
+    else
+      ret[cnt, "Indication"] <- module$indication
 
     if (is.null(module$keywords))
       ret[cnt, "Keywords"] <- ""

@@ -4,14 +4,32 @@
 \alias{read_module}
 \title{Reads a program module from the file system}
 \usage{
-read_module(location)
+read_module(location, version = NULL)
 }
 \arguments{
 \item{location}{The location to read the module from.}
+
+\item{version}{The version of the module to read.}
 }
 \value{
 A module located at the path provided.
+
+Returns the module at the specified path.
 }
 \description{
-Reads a program module from the file system
+To read a module from disk, use the \code{read_module} function.
+The function will read the module into a object and return it.
 }
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

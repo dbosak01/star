@@ -11,6 +11,25 @@ run_module(module, ...)
 
 \item{...}{Parameters for the module.}
 }
-\description{
-Run a module
+\value{
+The function will return the environment that the code runs in.
 }
+\description{
+The \code{run_module} function executes a module.  The function
+will pass parameters via an environment, and execute the module code
+in that environment.  The environment will then be returned from the function
+so it can be examined by the calling program.
+}
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

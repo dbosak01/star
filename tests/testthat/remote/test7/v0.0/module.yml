@@ -2,10 +2,10 @@ name: test7
 description: Test mod7
 major_version: 0
 minor_version: 0
-level: dev
+status: Development
 parameters: []
 version: v0.0
 created_by: dbosa
-create_date: 2023-03-17 06:02:59
+create_date: 2023-03-23 07:31:26
 local_path: ./modules/test7
 remote_path: ./remote/test7

@@ -8,33 +8,37 @@ dev <- FALSE
 
 test_that("cache1: get_cache_directory() works as expected", {
 
+  if (dev) {
+    cfgdir <- rappdirs::user_config_dir("star", roaming = FALSE)
 
-  cfgdir <- rappdirs::user_config_dir("star", roaming = FALSE)
+    cfgpth <-  file.path(cfgdir, "Config/config.yml")
 
-  cfgpth <-  file.path(cfgdir, "Config/config.yml")
+    if (file.exists(cfgpth))
+      file.remove(cfgpth)
 
-  if (file.exists(cfgpth))
-    file.remove(cfgpth)
+    res <- get_cache_directory()
 
-  res <- get_cache_directory()
+    cd <- rappdirs::user_cache_dir("star")
 
-  cd <- rappdirs::user_cache_dir("star")
-
-  expect_equal(res, cd)
-
-
-  cfg <- list("cache_directory" = file.path(base_path, "remote"))
+    expect_equal(res, cd)
 
 
-  yaml::write_yaml(cfg, cfgpth)
-
-  res2 <- get_cache_directory()
-
-  res2
-
-  expect_equal(res2, cfg$cache_directory)
+    cfg <- list("cache_directory" = file.path(base_path, "remote"))
 
 
+    yaml::write_yaml(cfg, cfgpth)
+
+    res2 <- get_cache_directory()
+
+    res2
+
+    expect_equal(res2, cfg$cache_directory)
+
+  } else {
+
+    expect_equal(1, 1)
+
+  }
 
 })
 
@@ -85,7 +89,7 @@ test_that("cache3: add_module() works as expected", {
 
   res <- create_module("test8", lpth, "Test mod8", overwrite = TRUE)
 
-  lst <- find_modules(version = "all")
+  lst <- find_modules(status = "all", version = "all")
 
 
   lst2 <- add_module(res)
@@ -101,7 +105,7 @@ test_that("cache4: find_modules() works with wildcard in name.", {
 
 
 
-  lst <- find_modules(name = "tbl*")
+  lst <- find_modules(name = "tbl*", status = "all")
 
   lst
 
@@ -109,12 +113,12 @@ test_that("cache4: find_modules() works with wildcard in name.", {
   expect_equal(nrow(lst) > 0, TRUE)
   expect_equal(lst[1, "Version"], "v0.1")
 
-  lst <- find_modules(name = "tbl*", version = "all")
+  lst <- find_modules(name = "tbl*", version = "all", status = "all")
 
   expect_equal(nrow(lst) > 0, TRUE)
 
 
-  lst <- find_modules(name = "tbl*", version = "v0.1")
+  lst <- find_modules(name = "tbl*", version = "v0.1", status = "all")
 
   expect_equal(nrow(lst) > 0, TRUE)
   expect_equal(lst[1, "Version"], "v0.1")

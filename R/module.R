@@ -11,9 +11,16 @@
 #' no value is supplied, the major version will default to zero.
 #' @param minor_version An integer that identifies the minor version number. If
 #' no value is supplied, the minor version will default to zero.
+#' @param type The type of module.  Valid values are "Table", "Listing", or
+#' "Figure".
+#' @param status The status of the module.  Valid values are "Development" or
+#' "Release".
 #' @param TA The therapeutic area to assign this module to.
-#' @param level The development level for this module.  Valid values are
-#' "dev", "test", and "prod".  Default value is "dev".
+#' @param indication The indication that the module will be used for.  Indication,
+#' if supplied, is a text string.
+#' @param domain The ADaM domains to be used for the module. The domain should
+#' be supplied as a vector of ADaM domain names.
+#' @param ADaMIG The version of ADaMIG used for this version of the module.
 #' @param keywords A vector of keywords to use for module search functions.
 #' @param dependancies A vector of packages on which this module is dependent.
 #' @family module
@@ -21,8 +28,12 @@
 #' @export
 module <- function(name, description = "",
                    major_version = 0L,
-                   minor_version = 0L, TA = NULL,
-                   level = "dev", keywords = c(),
+                   minor_version = 0L, type = NULL,
+                   status = "Development",
+                   TA = NULL,
+                   indication = NULL,
+                   domain = NULL,
+                   ADaMIG = NULL, keywords = c(),
                    dependancies = c()) {
 
 
@@ -33,8 +44,12 @@ module <- function(name, description = "",
   ret$description <- description
   ret$major_version <- major_version
   ret$minor_version <- minor_version
+  ret$type <- type
+  ret$status <- status
   ret$TA <- TA
-  ret$level <- level
+  ret$indication <- indication
+  ret$domain <- domain
+  ret$ADaMIG <- ADaMIG
   ret$keywords <- keywords
   ret$dependancies <- dependancies
   ret$parameters <- list()
@@ -58,9 +73,16 @@ module <- function(name, description = "",
 #' @param description A description of the module.
 #' @param major_version An integer that identifies the major version number.
 #' @param minor_version An integer that identifies the minor version number.
-#' @param TA The Therapeutic Area associated with this module.
-#' @param level The development level for this module.  Valid values are
-#' "dev", "test", and "prod".
+#' @param type The type of module.  Valid values are "Table", "Listing", or
+#' "Figure".
+#' @param status The status of the module.  Valid values are "Development" or
+#' "Release".
+#' @param TA The therapeutic area to assign this module to.
+#' @param indication The indication that the module will be used for.  Indication,
+#' if supplied, is a text string.
+#' @param domain The ADaM domains to be used for the module. The domain should
+#' be supplied as a vector of ADaM domain names.
+#' @param ADaMIG The version of ADaMIG used for this version of the module.
 #' @param keywords A vector of keywords to use for module search functions.
 #' @param dependancies A vector of packages on which this module is dependent.
 #' @param overwrite If the module directory already exists, the create_module()
@@ -74,8 +96,12 @@ module <- function(name, description = "",
 #' @export
 create_module <- function(name, local_path, description = "",
                           major_version = 0L,
-                          minor_version = 0L, TA = NULL,
-                          level = "dev", keywords = c(),
+                          minor_version = 0L, type = NULL,
+                          status = "Development",
+                          TA = NULL,
+                          indication = NULL,
+                          domain = NULL,
+                          ADaMIG = NULL, keywords = c(),
                           dependancies = c(), overwrite = FALSE) {
 
 
@@ -83,8 +109,9 @@ create_module <- function(name, local_path, description = "",
 
   # Get external data directory
   ret <- module(name, description = description, major_version = major_version,
-                minor_version = minor_version, TA = TA,
-                level = level, keywords = keywords, dependancies = dependancies)
+                minor_version = minor_version, type = type, status = status,
+                TA = TA, indication = indication, domain = domain, ADaMIG = ADaMIG,
+                keywords = keywords, dependancies = dependancies)
 
   ret$local_path <- local_path
   lp <- file.path(local_path, ret$version)
@@ -256,27 +283,57 @@ run_module <- function(module, ...) {
 #' @description To read a module from disk, use the \code{read_module} function.
 #' The function will read the module into a object and return it.
 #' @param location The location to read the module from.
+#' @param version The version of the module to read.
 #' @return A module located at the path provided.
 #' @family module
 #' @import yaml
 #' @return Returns the module at the specified path.
 #' @export
-read_module <- function(location) {
+read_module <- function(location, version = NULL) {
 
   if (!dir.exists(location))
-    stop("Location directory does not exist")
+    stop(paste0("Location directory does not exist: ", location))
 
-  pth <- file.path(location, "module.yml")
+  # Look locally
+  if (!is.null(version))
+    pth <- file.path(location, version, "module.yml")
+  else {
 
-  # If path doesn't exist, look in version folder
-  if (!file.exists(pth)) {
+    pth <- file.path(location, "module.yml")
 
-    dirs <- dir.find(location, pattern = "v*", up = 0, down = 1)
+    # If path doesn't exist, look in version folder
+    if (!file.exists(pth)) {
 
-    if (length(dirs) > 0)
-      pth <- file.path(dirs[[length(dirs)]], "module.yml")
+      dirs <- dir.find(location, pattern = "v*", up = 0, down = 1)
+
+      if (length(dirs) > 0)
+        pth <- file.path(dirs[[length(dirs)]], "module.yml")
+
+    }
   }
 
+  # Look remotely
+  if (!file.exists(pth)) {
+    if (!is.null(version))
+      pth <- file.path(get_cache_directory(), location, version, "module.yml")
+    else {
+
+      pth <- file.path(get_cache_directory(), location, "module.yml")
+
+      # If path doesn't exist, look in version folder
+      if (!file.exists(pth)) {
+
+        dirs <- dir.find(file.path(get_cache_directory(), location),
+                         pattern = "v*", up = 0, down = 1)
+
+        if (length(dirs) > 0)
+          pth <- file.path(dirs[[length(dirs)]], "module.yml")
+
+      }
+    }
+  }
+
+  # Give up
   if (!file.exists(pth)) {
 
     stop("Module file not found in this location.")
@@ -425,17 +482,35 @@ print.module <- function(x, ..., verbose = FALSE) {
     if (!is.null(x$major_version) & !is.null(x$minor_version))
       cat("- Version:",  x$version, "\n")
 
-    if (!is.null(x$level))
-      cat("- Level:", x$level, "\n")
+    if (!is.null(x$type))
+      cat("- Type:", x$type, "\n")
+
+    if (!is.null(x$status))
+      cat("- Status:", x$status, "\n")
 
     if (!is.null(x$TA))
       cat("- Theraputic Area:", x$TA, "\n")
+
+    if (!is.null(x$indication))
+      cat("- Indication:", x$indication, "\n")
+
+    if (!is.null(x$domain))
+      cat("- Domain:", x$domain, "\n")
+
+    if (!is.null(x$ADaMIG))
+      cat("- ADaMIG:", x$ADaMIG, "\n")
 
     if (!is.null(x$keywords))
       cat("- Keywords:", paste(x$keywords, collapse = ", "), "\n")
 
     if (!is.null(x$dependancies))
       cat("- Dependancies:", paste(x$dependancies, collapse = ", "), "\n")
+
+    if (!is.null(x$local_path))
+      cat("- Local Path:", x$local_path, "\n")
+
+    if (!is.null(x$remote_path))
+      cat("- Remote Path:", x$remote_path, "\n")
 
     if (!is.null(x$created_by))
       cat("- Created:", x$created_by, x$create_date, "\n")

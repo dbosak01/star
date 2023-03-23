@@ -9,18 +9,20 @@ Imports: rappdirs,
          common,
          yaml,
          crayon, 
-         utils
+         utils,
+         stats
 License: CC0
 Encoding: UTF-8
-Depends: R (>= 3.6.0)
+Depends: 
+    R (>= 4.1), 
+    ards
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    oncvis,
     dplyr, 
     tibble, 
     tidyr
 VignetteBuilder: knitr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Config/testthat/edition: 3

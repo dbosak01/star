@@ -2,10 +2,10 @@ name: test8
 description: Test mod8
 major_version: 0
 minor_version: 0
-level: dev
+status: Development
 parameters: []
 version: v0.0
 created_by: dbosa
-create_date: 2023-03-17 06:02:58
+create_date: 2023-03-23 07:31:24
 local_path: ./modules/test8
 remote_path: ''

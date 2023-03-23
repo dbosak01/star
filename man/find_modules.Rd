@@ -4,16 +4,49 @@
 \alias{find_modules}
 \title{Find Modules}
 \usage{
-find_modules(name = NULL, keywords = NULL, version = "latest")
+find_modules(
+  name = NULL,
+  type = NULL,
+  TA = NULL,
+  domain = NULL,
+  indication = NULL,
+  keywords = NULL,
+  status = "Release",
+  version = "latest"
+)
 }
 \arguments{
 \item{name}{The name of the module to search for. Parameter will accept wildcards.}
 
+\item{type}{The type of module to search for.  Valid values are "Table",
+"Listing", or "Figure".}
+
+\item{TA}{The Therapeutic Area to search for.}
+
+\item{domain}{The domain to search for.}
+
+\item{indication}{The indication to search for.}
+
 \item{keywords}{A vector of keywords to search for.}
+
+\item{status}{The status of the module to search for.  Valid values are
+"Development" and "Release".}
 
 \item{version}{A parameter that identifies the version or version to search for.
 Valid values are "all", "latest", or a vector of versions in the form "vX.Y".}
 }
-\description{
-Find Modules
+\value{
+A data frame of modules that meet the search criteria.
 }
+\description{
+Allows the user to search for modules in the module cache.  The
+function will return a data frame of modules that meet the specified criteria.
+Available search criteria are the name, keywords, and module version.
+}
+\seealso{
+Other cache: 
+\code{\link{pull_module}()},
+\code{\link{push_module}()},
+\code{\link{refresh_modules}()}
+}
+\concept{cache}

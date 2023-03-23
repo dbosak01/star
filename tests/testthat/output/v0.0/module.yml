@@ -2,16 +2,16 @@ name: Test1
 description: Here is a description
 major_version: 1.0
 minor_version: 2.0
-TA: test
-level:
+status: Development
+keywords:
 - hello
 - goodbye
-keywords:
+dependancies:
 - fmtr
 - reporter
 parameters: []
 version: v1.2
 created_by: dbosa
-create_date: 2023-03-17 06:02:58
+create_date: 2023-03-23 07:31:25
 local_path: ''
 remote_path: ''

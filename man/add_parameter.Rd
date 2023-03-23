@@ -36,8 +36,27 @@ as an R data type class name.}
 options values.}
 }
 \value{
-The modified module.
+The input module, with new parameter added.
+
+The modified module with new parameter added to the module
+parameter list.
 }
 \description{
-Adds a parameter to a program module
+The \code{add_parameter} function adds a parameter to a module.
+Each module is initalized with a parameter list.  This function adds a
+parameter to the list.  The arguments of the function define the new
+parameter.
 }
+\seealso{
+Other module: 
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

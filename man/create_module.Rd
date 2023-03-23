@@ -10,8 +10,12 @@ create_module(
   description = "",
   major_version = 0L,
   minor_version = 0L,
+  type = NULL,
+  status = "Development",
   TA = NULL,
-  level = "dev",
+  indication = NULL,
+  domain = NULL,
+  ADaMIG = NULL,
   keywords = c(),
   dependancies = c(),
   overwrite = FALSE
@@ -29,10 +33,21 @@ directory does not exist, it will be created.}
 
 \item{minor_version}{An integer that identifies the minor version number.}
 
-\item{TA}{The Therapeutic Area associated with this module.}
+\item{type}{The type of module.  Valid values are "Table", "Listing", or
+"Figure".}
 
-\item{level}{The development level for this module.  Valid values are
-"dev", "test", and "prod".}
+\item{status}{The status of the module.  Valid values are "Development" or
+"Release".}
+
+\item{TA}{The therapeutic area to assign this module to.}
+
+\item{indication}{The indication that the module will be used for.  Indication,
+if supplied, is a text string.}
+
+\item{domain}{The ADaM domains to be used for the module. The domain should
+be supplied as a vector of ADaM domain names.}
+
+\item{ADaMIG}{The version of ADaMIG used for this version of the module.}
 
 \item{keywords}{A vector of keywords to use for module search functions.}
 
@@ -42,7 +57,25 @@ directory does not exist, it will be created.}
 function will generate an error by default.  Set force = TRUE to overwrite
 the existing directory.}
 }
+\value{
+The newly created module.  By default, the parameter list will be
+empty.  To add a parameter to the module, use the \code{\link{add_parameter}}
+function.
+}
 \description{
 Function will create folder and template files to
 begin development of a new \strong{star} module.
 }
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

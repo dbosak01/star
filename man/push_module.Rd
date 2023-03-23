@@ -12,6 +12,18 @@ development directory of the module to push.}
 
 \item{level}{The status of the function.  Valid values are d, t, and p.}
 }
-\description{
-Function to promote a module
+\value{
+The function will return the pushed module.
 }
+\description{
+The \code{push_module} function promotes a module to the
+remote module cache. The function accepts a module object and a promotion
+level.
+}
+\seealso{
+Other cache: 
+\code{\link{find_modules}()},
+\code{\link{pull_module}()},
+\code{\link{refresh_modules}()}
+}
+\concept{cache}

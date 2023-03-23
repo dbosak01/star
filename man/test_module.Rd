@@ -12,3 +12,16 @@ test_module(mod = NULL)
 \description{
 Test a module
 }
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

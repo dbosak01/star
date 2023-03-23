@@ -15,7 +15,24 @@ or a module name.}
 \item{local_path}{The development directory for the new module. If the
 directory does not exist, it will be created.}
 }
-\description{
-Function will create folder and template files to
-begin development of a new \strong{star} module.
+\value{
+Returns the copied module.
 }
+\description{
+Function will copy the passed module and return the copy.
+The copy will be located in the specified path, or copy it to the
+local path if not specified.
+}
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{print.parameter}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}

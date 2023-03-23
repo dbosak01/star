@@ -14,6 +14,23 @@
 \item{verbose}{Whether to print the module in verbose mode.  Valid values
 are TRUE and FALSE.}
 }
-\description{
-Prints information about parameter
+\value{
+The parameter, invisibly.
 }
+\description{
+A function to print a module parameter.  The print out
+will include most attributes of the parameter, organized in a readable fashion.
+}
+\seealso{
+Other module: 
+\code{\link{add_parameter}()},
+\code{\link{copy_module}()},
+\code{\link{create_module}()},
+\code{\link{module}()},
+\code{\link{print.module}()},
+\code{\link{read_module}()},
+\code{\link{run_module}()},
+\code{\link{test_module}()},
+\code{\link{write_module}()}
+}
+\concept{module}
