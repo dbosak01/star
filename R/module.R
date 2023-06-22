@@ -131,34 +131,98 @@ create_module <- function(name, local_path, description = "",
   if (!dir.exists(lp))
     dir.create(lp, recursive = TRUE)
 
+  # Get package directory
   pkg <- system.file("extdata", package = "star")
 
+  # Get template directory
   tmplt <- file.path(pkg, "templates/blank")
 
+  # Retrieve file list from template directory
   lst <- file.find(tmplt, pattern = NULL, up = 0, down = 0)
 
+  # Copy files to new location
   for (fl in lst) {
 
     file.copy(fl, file.path(lp, basename(fl)),
               overwrite = TRUE)
   }
-  #browser()
-  drs <- dir.find(tmplt, pattern = NULL, up = -1, down = 1)
-  # print(tmplt)
-  # print(drs)
 
+  # Get folders in template directory
+  drs <- dir.find(tmplt, pattern = NULL, up = -1, down = 1)
+
+  # Create folders in new location
   for (dr in drs) {
 
     dir.create(file.path(lp, basename(dr)),
                showWarnings = FALSE, recursive = TRUE)
   }
 
-
+  # Write the module yaml to the local path
   write_module(ret, lp)
 
   return(ret)
 
 }
+
+
+
+#' @title Run a module
+#' @description The \code{run_module} function executes a module.  The function
+#' will pass parameters via an environment, and execute the module code
+#' in that environment.  The environment will then be returned from the function
+#' so it can be examined by the calling program.
+#' @param module  The module to run.
+#' @param ... Parameters for the module.
+#' @family module
+#' @return The function will return the environment that the code runs in.
+#' @export
+run_module <- function(module, ...) {
+
+  # Create new environment for module execution
+  ret <- new.env()
+
+  # Retrieve parameter definitions
+  defs <- module$parameters
+
+  # Assign default parameter values
+  for (d in names(defs)) {
+    ret[[d]] <- defs[[d]]$default
+  }
+
+  # Retrieve parameters
+  parms <- list(...)
+
+  # Assign parameter values to environment
+  for (p in names(parms)) {
+    ret[[p]] <- parms[[p]]
+  }
+
+  # Get module source file
+  pth <- module$local_path
+
+  if (is.null(pth)) {
+    stop("Module local path not found.")
+  }
+
+  fl <- file.path(pth, module$version, "module.R")
+
+
+  if (file.exists(fl)) {
+
+  source(fl, local = ret)
+
+  } else {
+
+    stop("Source file '" %p% fl %p% "' not found.")
+  }
+
+
+  return(ret)
+
+}
+
+
+# In Progress -------------------------------------------------------------
 
 
 
@@ -219,62 +283,6 @@ test_module <- function(mod = NULL) {
 
 
 }
-
-#' @title Run a module
-#' @description The \code{run_module} function executes a module.  The function
-#' will pass parameters via an environment, and execute the module code
-#' in that environment.  The environment will then be returned from the function
-#' so it can be examined by the calling program.
-#' @param module  The module to run.
-#' @param ... Parameters for the module.
-#' @family module
-#' @return The function will return the environment that the code runs in.
-#' @export
-run_module <- function(module, ...) {
-
-  # Create new environment for module execution
-  ret <- new.env()
-
-  # Retrieve parameter definitions
-  defs <- module$parameters
-
-  # Assign default parameter values
-  for (d in names(defs)) {
-    ret[[d]] <- defs[[d]]$default
-  }
-
-  # Retrieve parameters
-  parms <- list(...)
-
-  # Assign parameter values to environment
-  for (p in names(parms)) {
-    ret[[p]] <- parms[[p]]
-  }
-
-  # Get module source file
-  pth <- module$local_path
-
-  if (is.null(pth)) {
-    stop("Module local path not found.")
-  }
-
-  fl <- file.path(pth, module$version, "module.R")
-
-
-  if (file.exists(fl)) {
-
-  source(fl, local = ret)
-
-  } else {
-
-    stop("Source file '" %p% fl %p% "' not found.")
-  }
-
-
-  return(ret)
-
-}
-
 
 # Read and Write ----------------------------------------------------------
 
@@ -339,11 +347,13 @@ read_module <- function(location, version = NULL) {
     stop("Module file not found in this location.")
   }
 
+  # Read in yaml
   ret <- read_yaml(pth, fileEncoding = "UTF-8")
 
+  # Assign class of module
   class(ret) <- c("module", "list")
 
-
+  # Assign class of parameters
   if (!is.null(ret$parameters)) {
     if (length(ret$parameters) > 0) {
 
@@ -374,18 +384,20 @@ read_module <- function(location, version = NULL) {
 #' @export
 write_module <- function(mod, location = NULL) {
 
+  # If location is not specified, write to local path
   if (is.null(location)) {
 
     location <- file.path(mod$local_path, mod$version)
 
   }
 
-
   if (!dir.exists(location))
     stop(paste0("Location directory '", location, "' does not exist."))
 
+  # Get yaml path
   pth <- file.path(location, "module.yml")
 
+  # Write module yaml
   write_yaml(mod, pth, fileEncoding = "UTF-8")
 
 

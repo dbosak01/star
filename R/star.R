@@ -12,6 +12,5 @@
 #' }
 #' Note that...
 #' @docType package
-#' @import ards
 #' @name star
 NULL

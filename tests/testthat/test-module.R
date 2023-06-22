@@ -139,7 +139,7 @@ test_that("mod5: print.module() works as expected.", {
                 keywords = c("hello", "goodbye"),
                 dependancies = c("fmtr", "reporter"))
 
-  print(mod)
+  # print(mod)
 
 
   expect_equal(1, 1)

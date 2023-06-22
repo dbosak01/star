@@ -14,8 +14,7 @@ Imports: rappdirs,
 License: CC0
 Encoding: UTF-8
 Depends: 
-    R (>= 4.1), 
-    ards
+    R (>= 4.0.0)
 Suggests: 
     knitr,
     rmarkdown,
@@ -24,5 +23,5 @@ Suggests:
     tibble, 
     tidyr
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.1.1
 Config/testthat/edition: 3

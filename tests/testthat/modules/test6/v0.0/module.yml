@@ -21,6 +21,6 @@ parameters:
     data_type: integer
 version: v0.0
 created_by: dbosa
-create_date: 2023-03-23 07:31:25
+create_date: 2023-06-22 16:05:11
 local_path: ./modules/test6
-remote_path: ./remote/test6
+remote_path: c:/packages/star/tests/testthat/remote/test6
