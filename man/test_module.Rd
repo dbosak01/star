@@ -22,6 +22,7 @@ Other module:
 \code{\link{print.parameter}()},
 \code{\link{read_module}()},
 \code{\link{run_module}()},
+\code{\link{set_globals}()},
 \code{\link{write_module}()}
 }
 \concept{module}

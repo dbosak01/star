@@ -29,6 +29,7 @@ Other module:
 \code{\link{print.module}()},
 \code{\link{print.parameter}()},
 \code{\link{read_module}()},
+\code{\link{set_globals}()},
 \code{\link{test_module}()},
 \code{\link{write_module}()}
 }

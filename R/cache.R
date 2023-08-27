@@ -497,6 +497,45 @@ pull_module <- function(name, version = NULL, location = NULL) {
 }
 
 
+#' @title Gets and sets the configuration file on the local machine
+#' @description The \code{set_config} function opens the configuration
+#' file on the local machine and sets it with any passed parameters.  If
+#' no parameters are passed, the function simply returns the existing config.
+#' If no config file exists, it will be created.
+#' @param cache_directory The path of the global module cache.
+#' @param local_directory The path of the local module development area.
+#' @return The updated configuration.  Configuration is returned as a list.
+#' @family cache
+#' @export
+#' @import rappdirs
+#' @import yaml
+set_config <- function(cache_directory = NULL, local_directory = NULL) {
+
+  cnfg <- list()
+
+
+  cpth <- file.path(user_config_dir("star", roaming = FALSE), "Config/config.yml")
+
+  if (file.exists(cpth)) {
+
+    yml <- yaml::read_yaml(cpth)
+
+    cnfg[["cache_directory"]] <- yml$cache_directory
+    cnfg[["local_directory"]] <- yml$local_directory
+  }
+
+  if (!is.null(cache_directory)) {
+    cnfg[["cache_directory"]] <- cache_directory
+  }
+
+  if (!is.null(local_directory)) {
+    cnfg[["local_directory"]] <- local_directory
+  }
+
+  yaml::write_yaml(cnfg, cpth, fileEncoding = "UTF-8")
+
+  return(cnfg)
+}
 
 # Utilities ---------------------------------------------------------------
 

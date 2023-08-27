@@ -6,6 +6,6 @@ status: Development
 parameters: []
 version: v0.0
 created_by: dbosa
-create_date: 2023-06-22 16:12:28
+create_date: 2023-08-27 00:43:18
 local_path: ./modules/test7
 remote_path: c:/packages/star/tests/testthat/remote/test7

@@ -31,6 +31,7 @@ will return the most recent version.
 Other cache: 
 \code{\link{find_modules}()},
 \code{\link{push_module}()},
-\code{\link{refresh_modules}()}
+\code{\link{refresh_modules}()},
+\code{\link{set_config}()}
 }
 \concept{cache}

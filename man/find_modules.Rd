@@ -47,6 +47,7 @@ Available search criteria are the name, keywords, and module version.
 Other cache: 
 \code{\link{pull_module}()},
 \code{\link{push_module}()},
-\code{\link{refresh_modules}()}
+\code{\link{refresh_modules}()},
+\code{\link{set_config}()}
 }
 \concept{cache}

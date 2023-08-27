@@ -3,6 +3,7 @@
 \docType{package}
 \name{star}
 \alias{star}
+\alias{star-package}
 \title{A Framework for Modular Program Extensions}
 \description{
 The \strong{modular} package provides an extensible framework for sharing

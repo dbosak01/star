@@ -21,6 +21,7 @@ a data frame with information about the modules.
 Other cache: 
 \code{\link{find_modules}()},
 \code{\link{pull_module}()},
-\code{\link{push_module}()}
+\code{\link{push_module}()},
+\code{\link{set_config}()}
 }
 \concept{cache}

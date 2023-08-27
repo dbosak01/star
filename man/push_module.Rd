@@ -24,6 +24,7 @@ level.
 Other cache: 
 \code{\link{find_modules}()},
 \code{\link{pull_module}()},
-\code{\link{refresh_modules}()}
+\code{\link{refresh_modules}()},
+\code{\link{set_config}()}
 }
 \concept{cache}

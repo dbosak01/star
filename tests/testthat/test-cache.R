@@ -148,6 +148,87 @@ test_that("cache5: push_module() works as expected", {
 
 })
 
+
+test_that("cache6: set_config() works as expected", {
+
+  if (dev) {
+    ret <- set_config()
+
+    ret
+
+    expect_equal(is.null(ret$cache_directory), FALSE)
+
+    ldir <- "c:/packages/star/tests/testthat/modules"
+
+    ret1 <- set_config(local_directory = ldir)
+
+    ret1
+
+
+    expect_equal(is.null(ret$local_directory), FALSE)
+  } else {
+
+   expect_equal(TRUE, TRUE)
+  }
+
+
+})
+
+
+test_that("cache7: set_globals() works as expected", {
+
+  if (dev) {
+
+    ldir <- "c:/packages/star/tests/testthat/output/m.globals"
+
+    fmt <- fmtr::value(fmtr::condition(x == 1, "One"),
+                       fmtr::condition(x == 2, "Two"))
+
+    ret <- set_globals(ldir, test1 = "fork", test2 = 123,
+                       test3 = c(1, 2, 3), test4 = fmt)
+
+
+    ret
+
+    expect_equal(file.exists(ldir), TRUE)
+
+
+    expect_equal(ret$test1, "fork")
+    expect_equal(ret$test2, 123)
+
+    res <- fmtr::fapply(ret$test3, ret$test4)
+
+    expect_equal(res, c("One", "Two", "3"))
+
+
+    ret <- set_globals(ldir, test5 = "even more")
+
+
+    expect_equal(length(ret), 5)
+    expect_equal(ret$test5, "even more")
+
+
+    setwd("c:/packages/star/tests/testthat/output")
+
+    ret <- set_globals()
+
+    expect_equal(length(ret), 5)
+
+    if (file.exists(ldir))
+      file.remove(ldir)
+
+    setwd("c:/packages/star")
+
+  } else {
+
+    expect_equal(TRUE, TRUE)
+  }
+
+
+})
+
+
+
 #
 #
 # test_that("mod6: create_module() works as expected", {

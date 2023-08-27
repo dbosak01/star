@@ -12,5 +12,6 @@
 #' }
 #' Note that...
 #' @docType package
+#' @aliases star-package
 #' @name star
 NULL
